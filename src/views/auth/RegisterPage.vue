@@ -1,0 +1,288 @@
+<template>
+  <div class="register-page">
+    <div class="auth-wrapper">
+      <div class="auth-main">
+        <div class="auth-container">
+          <div class="auth-header">
+            <h2 class="auth-title">创建账号</h2>
+            <p class="auth-subtitle">加入校园社区，开启 AI 校园生活</p>
+          </div>
+          <el-form ref="formRef" :model="form" :rules="rules" class="auth-form" @keyup.enter="handleRegister">
+            <el-form-item prop="student_id">
+              <el-input v-model="form.student_id" placeholder="学号" :prefix-icon="User" size="large" class="auth-input" />
+            </el-form-item>
+            <el-row :gutter="12">
+              <el-col :span="12">
+                <el-form-item prop="password">
+                  <el-input v-model="form.password" type="password" placeholder="密码" :prefix-icon="Lock" size="large" class="auth-input" show-password />
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item prop="confirmPassword">
+                  <el-input v-model="form.confirmPassword" type="password" placeholder="确认密码" :prefix-icon="Lock" size="large" class="auth-input" show-password />
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-form-item prop="nickname">
+              <el-input v-model="form.nickname" placeholder="昵称" size="large" class="auth-input" />
+            </el-form-item>
+            <el-row :gutter="12">
+              <el-col :span="12">
+                <el-form-item prop="college">
+                  <el-select v-model="form.college" placeholder="学院" size="large" style="$sidebar-width:100%">
+                    <el-option v-for="col in colleges" :key="col" :label="col" :value="col" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item prop="grade">
+                  <el-select v-model="form.grade" placeholder="年级" size="large" style="$sidebar-width:100%">
+                    <el-option v-for="g in grades" :key="g" :label="g" :value="g" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-form-item>
+              <el-button type="$color-primary" size="large" class="auth-btn" :loading="authStore.loading" @click="handleRegister">注册</el-button>
+            </el-form-item>
+          </el-form>
+          <div class="auth-footer">
+            <span class="auth-footer-text">已有账号？</span>
+            <router-link to="/login" class="auth-link">立即登录</router-link>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-side">
+        <div class="auth-side-content">
+          <div class="auth-brand-icon">
+            <svg $sidebar-width="64" $navbar-height="64" viewBox="0 0 64 64" fill="none">
+              <rect $sidebar-width="64" $navbar-height="64" rx="16" fill="url(#auth-grad)"/>
+              <path d="M32 12L16 22v20l16 10 16-10V22L32 12z" fill="rgba(255,255,255,0.95)" stroke="rgba(255,255,255,0.3)" stroke-width="0.5"/>
+              <rect x="29" y="28" $sidebar-width="6" $navbar-height="12" rx="2" fill="url(#auth-grad)" opacity="0.85"/>
+              <defs>
+                <linearGradient id="auth-grad" x1="0" y1="0" x2="64" y2="64">
+                  <stop offset="0%" stop-color="#4A6CF7"/>
+                  <stop offset="100%" stop-color="#5EC4AC"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <h1 class="auth-side-title">加入我们</h1>
+          <p class="auth-side-desc">和全校同学一起分享校园生活</p>
+          <div class="auth-stats">
+            <div class="auth-stat">
+              <span class="auth-stat-num">100+</span>
+              <span class="auth-stat-label">活跃用户</span>
+            </div>
+            <div class="auth-stat-divider"></div>
+            <div class="auth-stat">
+              <span class="auth-stat-num">50+</span>
+              <span class="auth-stat-label">每日帖子</span>
+            </div>
+            <div class="auth-stat-divider"></div>
+            <div class="auth-stat">
+              <span class="auth-stat-num">10+</span>
+              <span class="auth-stat-label">社团活动</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, reactive } from 'vue'
+import { useRouter } from 'vue-router'
+import { User, Lock } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+import { useAuthStore } from '@/stores/auth'
+
+const router = useRouter()
+const authStore = useAuthStore()
+const formRef = ref(null)
+const form = reactive({ student_id: '', password: '', confirmPassword: '', nickname: '', college: '', grade: '' })
+
+const colleges = ['计算机学院', '数学学院', '外国语学院', '经济学院', '法学院', '艺术学院', '医学院', '其他']
+const grades = ['大一', '大二', '大三', '大四', '研一', '研二', '研三', '博士']
+
+const validatePass = (_rule, value, callback) => { if (value !== form.password) callback(new Error('两次密码不一致')); else callback() }
+const rules = {
+  student_id: [{ required: true, message: '请输入学号', trigger: 'blur' }],
+  password: [{ required: true, message: '请输入密码', trigger: 'blur' }, { min: 6, message: '密码至少6位', trigger: 'blur' }],
+  confirmPassword: [{ required: true, message: '请确认密码', trigger: 'blur' }, { validator: validatePass, trigger: 'blur' }],
+  nickname: [{ required: true, message: '请输入昵称', trigger: 'blur' }, { $content-max: 20, message: '昵称不超过20字', trigger: 'blur' }],
+  college: [{ required: true, message: '请选择学院', trigger: 'change' }],
+  grade: [{ required: true, message: '请选择年级', trigger: 'change' }]
+}
+
+async function handleRegister() {
+  const valid = await formRef.value?.validate().catch(() => false)
+  if (!valid) return
+  try {
+    await authStore.register(form.student_id, form.password, form.nickname, form.college, form.grade)
+    ElMessage.success('注册成功！'); router.push('/')
+  } catch (e) { ElMessage.error(e.message || '注册失败') }
+}
+</script>
+
+<style scoped lang="scss">
+@use '@/assets/styles/variables' as *;
+
+.register-page {
+  $sidebar-width: 100%;
+  min-height: 100vh;
+  $fontdisplay: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #EEF2FF 0%, #E0F5F0 50%, #FEF3E8 100%);
+}
+
+.auth-wrapper {
+  $fontdisplay: flex;
+  flex-direction: row-reverse;
+  $sidebar-width: 860px;
+  max-width: 100%;
+  min-height: 600px;
+  $colorbackground: background: $color-card;
+  border-radius: $radius-xl;
+  box-shadow: -xl;
+  overflow: hidden;
+}
+
+.auth-side {
+  $sidebar-width: 380px;
+  background: linear-gradient(135deg, #5EC4AC 0%, #4A6CF7 100%);
+  padding: 48px 36px;
+  $fontdisplay: flex;
+  align-items: center;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.06;
+    background-image:
+      radial-gradient(circle at 40% 30%, white 2px, transparent 2px),
+      radial-gradient(circle at 60% 70%, white 1.5px, transparent 1.5px);
+    background-size: 50px 50px, 40px 40px;
+  }
+}
+
+.auth-side-content { position: relative; z-index: 1; color: white; }
+
+.auth-brand-icon { margin-bottom: 20px; }
+
+.auth-side-title {
+  $font-display;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.auth-side-desc {
+  $font-sizeborder-radius: border-radius: $radius-sm;
+  opacity: 0.85;
+  margin-bottom: 36px;
+}
+
+.auth-stats {
+  $fontdisplay: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.auth-stat {
+  flex: 1;
+  text-align: center;
+}
+
+.auth-stat-num {
+  $fontdisplay: block;
+  $font-display;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.auth-stat-label {
+  $font-size-xs;
+  opacity: 0.8;
+}
+
+.auth-stat-divider {
+  $sidebar-width: 1px;
+  $navbar-height: 30px;
+  background: rgba(255,255,255,0.3);
+}
+
+.auth-main {
+  flex: 1;
+  $fontdisplay: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+}
+
+.auth-container {
+  $sidebar-width: 400px;
+  max-width: 100%;
+}
+
+.auth-header { margin-bottom: 28px; }
+
+.auth-title {
+  $font-display;
+  font-size: 1.5rem;
+  font-weight: 700;
+  $colorcolor: -textcolor: color: $color-primary;
+  margin-bottom: 6px;
+}
+
+.auth-subtitle {
+  $font-sizeborder-radius: border-radius: $radius-sm;
+  $colorcolor: color: $color-text-secondary;
+}
+
+.auth-form :deep(.el-input__wrapper) {
+  $radiusborder-radius: border-radius: $radius-md;
+  padding: 4px 16px;
+  $navbar-height: 44px;
+}
+
+.auth-form :deep(.el-select .el-input__wrapper) {
+  $navbar-height: 44px;
+}
+
+.auth-btn {
+  $sidebar-width: 100%;
+  $navbar-height: 48px;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  $radiusborder-radius: border-radius: $radius-md;
+  margin-top: 4px;
+}
+
+.auth-footer {
+  text-align: center;
+  $colorcolor: color: $color-text-secondary;
+  $font-sizeborder-radius: border-radius: $radius-sm;
+}
+
+.auth-link {
+  $colorcolor: color: $color-primary;
+  font-weight: 600;
+  &:hover { text-decoration: underline; }
+}
+
+@media (max-width: 768px) {
+  .auth-side { $fontdisplay: none; }
+  .auth-main { padding: 32px 24px; }
+  .auth-wrapper { min-height: auto; }
+}
+</style>

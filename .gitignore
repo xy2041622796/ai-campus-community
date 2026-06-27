@@ -1,0 +1,16 @@
+﻿node_modules/
+dist/
+.env
+.superpowers/
+*.py
+
+# Build & temp
+.pnpm-store/
+.planning/
+*.bak
+*.cjs
+test.txt
+skills-lock.json
+.docs/
+/docs/*.db
+/docs/*.md

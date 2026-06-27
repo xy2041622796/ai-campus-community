@@ -1,0 +1,73 @@
+@use './variables' as *;
+
+:root {
+  --color-primary: #{$color-primary};
+  --color-primary-light: #{$color-primary-light};
+  --color-accent: #{$color-accent};
+  --color-surface: #{$color-surface};
+  --color-card: #{$color-card};
+  --color-text-primary: #{$color-text-primary};
+  --color-text-secondary: #{$color-text-secondary};
+  --color-border: #{$color-border};
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  font-family: $font-body;
+  background: $color-surface;
+  color: $color-text-primary;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: $line-height-normal;
+  font-size: 16px;
+}
+
+#app { height: 100%; }
+
+::selection { background: rgba(74, 108, 247, 0.15); color: $color-text-primary; }
+
+h1, h2, h3, h4, h5, h6 { font-family: $font-display; line-height: $line-height-tight; }
+
+a { text-decoration: none; color: $color-primary; transition: color 0.2s; }
+a:hover { color: darken($color-primary, 8%); }
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #D0D7E0; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #B0B8C4; }
+
+.el-button--primary {
+  background: $color-primary-gradient !important;
+  border: none !important;
+  transition: $transition-normal !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.2px !important;
+  &:hover { opacity: 0.92; transform: translateY(-1px); box-shadow: $shadow-md !important; }
+  &:active { transform: translateY(0); }
+}
+
+.el-button--primary.is-round { border-radius: $radius-round !important; }
+.el-button--primary.is-plain { background: $color-primary-soft !important; color: $color-primary !important; border: none !important; }
+
+.el-tag {
+  border-radius: $radius-round !important;
+  font-weight: 500 !important;
+  padding: 0 10px !important;
+  height: 24px !important;
+  line-height: 24px !important;
+}
+
+.el-skeleton { border-radius: $radius-lg; }
+.el-empty { padding: $spacing-xxl 0; }
+
+.el-dropdown-menu__item {
+  display: flex;
+  align-items: center;
+  font-size: $font-size-sm !important;
+  svg { flex-shrink: 0; }
+}
+
+.el-input__wrapper { box-shadow: none !important; }
+.el-input__wrapper.is-focus { box-shadow: 0 0 0 1px $color-primary inset !important; }
