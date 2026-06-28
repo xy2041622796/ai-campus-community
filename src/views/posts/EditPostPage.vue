@@ -26,7 +26,7 @@
         <el-form-item>
           <div class="form-actions">
             <el-button @click="router.back()">取消</el-button>
-            <el-button type="$color-primary" :loading="submitting" @click="handleSubmit">保存修改</el-button>
+            <el-button type="primary" :loading="submitting" @click="handleSubmit">保存修改</el-button>
           </div>
         </el-form-item>
       </el-form>

@@ -49,7 +49,7 @@
               <el-input v-model="form.password" type="password" placeholder="密码" :prefix-icon="Lock" size="large" class="auth-input" show-password />
             </el-form-item>
             <el-form-item>
-              <el-button type="$color-primary" size="large" class="auth-btn" :loading="authStore.loading" @click="handleLogin">
+              <el-button type="primary" size="large" class="auth-btn" :loading="authStore.loading" @click="handleLogin">
                 <span v-if="!authStore.loading">登录</span>
                 <span v-else>登录中...</span>
               </el-button>

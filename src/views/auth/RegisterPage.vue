@@ -43,7 +43,7 @@
               </el-col>
             </el-row>
             <el-form-item>
-              <el-button type="$color-primary" size="large" class="auth-btn" :loading="authStore.loading" @click="handleRegister">注册</el-button>
+              <el-button type="primary" size="large" class="auth-btn" :loading="authStore.loading" @click="handleRegister">注册</el-button>
             </el-form-item>
           </el-form>
           <div class="auth-footer">

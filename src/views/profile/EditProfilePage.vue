@@ -43,7 +43,7 @@
         <el-form-item>
           <div class="form-actions">
             <el-button @click="router.back()">取消</el-button>
-            <el-button type="$color-primary" :loading="profileStore.loading" @click="handleSave">保存修改</el-button>
+            <el-button type="primary" :loading="profileStore.loading" @click="handleSave">保存修改</el-button>
           </div>
         </el-form-item>
       </el-form>
