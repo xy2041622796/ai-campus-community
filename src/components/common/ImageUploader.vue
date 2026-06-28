@@ -134,7 +134,7 @@ function removeImage(index) {
 .img-upload-cell {
   width: 120px;
   height: 120px;
-  border: 2px dashed -border;
+  border: 2px dashed $color-border;
   border-radius: $radius-md;
   display: flex;
   flex-direction: column;
@@ -184,7 +184,7 @@ function removeImage(index) {
 .single-upload {
   width: 120px;
   height: 120px;
-  border: 2px dashed -border;
+  border: 2px dashed $color-border;
   border-radius: $radius-lg;
   display: flex;
   flex-direction: column;
