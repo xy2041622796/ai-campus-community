@@ -26,12 +26,7 @@
       <div class="sidebar-divider"></div>
 
       <!-- 快捷操作 -->
-      <button class="sidebar-post-btn" @click="router.push('/posts/new')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
-        <span>发布新帖子</span>
-      </button>
+
 
       <div class="sidebar-spacer"></div>
 
@@ -209,25 +204,7 @@ function isActive(item) {
   margin: 8px 0;
 }
 
-.sidebar-post-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: $radius-md;
-  background: $color-primary-gradient;
-  color: white;
-  font-size: $font-size-sm;
-  font-weight: 600;
-  cursor: pointer;
-  transition: $transition-normal;
-  box-shadow: 0 2px 8px rgba(74, 108, 247, 0.2);
-  &:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(74, 108, 247, 0.3); }
-  &:active { transform: translateY(0); }
-}
+
 
 .sidebar-spacer { flex: 1; }
 

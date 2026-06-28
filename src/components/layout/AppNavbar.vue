@@ -44,32 +44,7 @@
         </div>
 
         <!-- 主导航 -->
-        <div class="nav-tabs">
-          <router-link to="/" class="nav-tab" :class="{ active: route.path === '/' }">
-            <span class="tab-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
-              </svg>
-            </span>
-            <span class="tab-label">首页</span>
-          </router-link>
-          <router-link to="/discover" class="nav-tab">
-            <span class="tab-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              </svg>
-            </span>
-            <span class="tab-label">发现</span>
-          </router-link>
-          <router-link to="/activities" class="nav-tab">
-            <span class="tab-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-              </svg>
-            </span>
-            <span class="tab-label">活动</span>
-          </router-link>
-        </div>
+
       </div>
 
       <!-- ===== 右侧：操作 + 用户 ===== -->
@@ -269,48 +244,7 @@ function handleCommand(cmd) {
 
 .nav-search :deep(.el-input__inner) { font-size: 0.8125rem; }
 
-.nav-tabs {
-  display: flex;
-  gap: 2px;
-  order: 1;
-}
 
-.nav-tab {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 14px;
-  border-radius: 8px;
-  color: $color-text-tertiary;
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-decoration: none;
-  transition: all 0.2s ease;
-  position: relative;
-
-  &:hover { color: $color-primary; background: $color-primary-subtle; }
-
-  &.active {
-    color: $color-primary;
-    font-weight: 600;
-    background: $color-primary-subtle;
-  }
-
-  &.active::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 20px;
-    height: 3px;
-    background: $color-primary-gradient;
-    border-radius: 2px;
-  }
-}
-
-.tab-icon { display: flex; align-items: center; opacity: 0.8; }
-.nav-tab.active .tab-icon { opacity: 1; }
 
 /* Right side */
 .nav-right {
@@ -443,7 +377,7 @@ function handleCommand(cmd) {
   .brand-icon { width: 30px; height: 30px; }
   .brand-name { font-size: 1rem; }
   .brand-badge { display: none; }
-  .nav-tabs { display: none; }
+
   .search-wrap { max-width: none; min-width: 80px; }
   .btn-post span { display: none; }
   .btn-post { padding: 7px 10px; }
