@@ -32,8 +32,13 @@ export const useAIStore = defineStore('ai', () => {
       const data = await res.json()
       return data.choices?.[0]?.message?.content || text
     } catch (e) {
-      if (!import.meta.env.VITE_AGNES_KEY) {
-        ElMessage.error('请在.env中配置VITE_AGNES_KEY后重启服务')
+      console.error('[AI] error:', e)
+      if (e.name === 'TypeError' && e.message.includes('fetch')) {
+        ElMessage.error('网络连接失败，请检查网络或梯子是否正常')
+      } else if (!import.meta.env.VITE_AGNES_KEY) {
+        ElMessage.error('请在.env中配置VITE_AGNES_KEY')
+      } else {
+        ElMessage.error(e.message || '服务失败')
       }
       return text
     } finally {
