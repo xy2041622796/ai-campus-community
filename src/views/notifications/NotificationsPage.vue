@@ -135,7 +135,7 @@ function handleClick(item) {
   width: 20px;
   height: 20px;
   border: 2px solid -border;
-  border-top-;
+  border-top: $color-border-light;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
