@@ -13,10 +13,19 @@ export const useEventStore = defineStore('event', () => {
     try {
       const { data, error } = await supabase
         .from('events')
-        .select('*, organizer:organizer_id(id, nickname, avatar_url), participant_count:get_event_participant_count(event_id)')
+        .select('*, organizer:organizer_id(id, nickname, avatar_url)')
         .order('event_date', { ascending: true })
       if (error) throw error
       events.value = data || []
+      // Get participant counts for each event
+      for (const ev of events.value) {
+        const { count } = await supabase
+          .from('event_participants')
+          .select('*', { count: 'exact', head: true })
+          .eq('event_id', ev.id)
+          .eq('status', 'registered')
+        ev.participant_count = count || 0
+      }
     } finally { loading.value = false }
   }
 

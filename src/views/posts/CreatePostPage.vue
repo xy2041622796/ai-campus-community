@@ -111,7 +111,6 @@ async function handleSubmit() {
 .create-card :deep(.el-input__wrapper) { border-radius: $radius-md; }
 .create-card :deep(.el-textarea__inner) { border-radius: $radius-md; min-height: 140px; }
 
-.form-actions {
 .form-ai-actions {
   display: flex;
   gap: 8px;
