@@ -44,9 +44,29 @@
       </el-form>
     </div>
   </div>
+  <el-dialog v-model="showPolishDialog" title="AI 润色结果" width="90%" max-width="640px" :close-on-click-modal="false">
+    <div v-if="polishResult" class="polish-compare">
+      <div class="pc-col">
+        <div class="pc-label">原来的文字</div>
+        <div class="pc-content original">{{ polishOriginal }}</div>
+      </div>
+      <div class="pc-arrow">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4A6CF7" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div class="pc-col">
+        <div class="pc-label">润色后的文字</div>
+        <div class="pc-content polished">{{ polishResult }}</div>
+      </div>
+    </div>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="polishResult = null; showPolishDialog = false">取消</el-button>
+        <el-button @click="handleRePolish" :loading="polishLoading">重新润色</el-button>
+        <el-button type="primary" @click="handleAcceptPolish">同意替换</el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
-
-<script setup>
 import { ref, reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
@@ -60,6 +80,9 @@ const postStore = usePostStore()
 const formRef = ref(null)
 const submitting = ref(false)
 const aiStore = useAIStore()
+const showPolishDialog = ref(false)
+const polishOriginal = ref('')
+const polishResult = ref('')
 const polishLoading = computed(() => aiStore.polishing)
 const charCount = computed(() => form.content.length)
 const form = reactive({ title: '', content: '', images: [], tags: [] })
@@ -142,6 +165,17 @@ async function handleSubmit() {
 }
 
 .ai-hint { font-size: $font-size-xs; color: $color-text-tertiary; }
+
+.polish-compare { display: flex; gap: 16px; align-items: flex-start; }
+.pc-col { flex: 1; min-width: 0; }
+.pc-label { font-size: $font-size-xs; font-weight: 600; color: $color-text-tertiary; margin-bottom: 8px; letter-spacing: 0.5px; }
+.pc-content { padding: 12px; border-radius: $radius-md; font-size: $font-size-base; line-height: $line-height-normal; white-space: pre-wrap; word-break: break-word; min-height: 100px; }
+.pc-content.original { background: $color-surface; color: $color-text-secondary; }
+.pc-content.polished { background: $color-primary-subtle; color: $color-text-primary; }
+.pc-arrow { padding-top: 28px; flex-shrink: 0; }
+.dialog-footer { display: flex; justify-content: flex-end; gap: 8px; }
+
+@media (max-width: 768px) { .polish-compare { flex-direction: column; } .pc-arrow { display: none; } }
 
 .form-actions {
   display: flex;
