@@ -13,6 +13,9 @@
         </el-form-item>
 
         <el-form-item label="正文" prop="content">
+          <div class="content-toolbar">
+            <el-button size="small" class="ai-polish-btn" :loading="polishLoading" :disabled="!form.content.trim()" @click="handlePolish"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> 润色</el-button>
+          </div>
           <el-input v-model="form.content" type="textarea" :rows="6" placeholder="分享你的校园故事、问题或想法..." maxlength="2000" show-word-limit />
         </el-form-item>
 
@@ -25,16 +28,7 @@
         </el-form-item>
 
         <el-form-item>
-          <div class="form-ai-actions">
-            <div class="ai-tip">
-              <el-button size="small" class="ai-polish-btn" :loading="polishLoading"  @click="handlePolish">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                AI 涝色
-              </el-button>
-              <span class="ai-hint" v-if="!form.content.trim()">请先填写正文</span><span class="ai-hint" v-else>让你优化表辑表辑又达达</span>
-            </div>
-          </div>
-          <div class="form-actions">
+          <div class="form-actions"><div class="form-actions">
             <el-button @click="router.back()">取消</el-button>
             <el-button type="primary" :loading="submitting" @click="handleSubmit">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -45,7 +39,7 @@
       </el-form>
     </div>
   </div>
-  <el-dialog v-model="showPolishDialog" title="AI 润色结果" width="90%" max-width="640px" :close-on-click-modal="false">
+  <el-dialog v-model="showPolishDialog" title="润色对比" width="90%" max-width="640px" :close-on-click-modal="false">
     <div v-if="polishResult" class="polish-compare">
       <div class="pc-col">
         <div class="pc-label">原来的文字</div>
@@ -154,18 +148,7 @@ async function handleSubmit() {
 .create-card :deep(.el-input__wrapper) { border-radius: $radius-md; }
 .create-card :deep(.el-textarea__inner) { border-radius: $radius-md; min-height: 140px; }
 
-.form-ai-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
-  padding: 10px 14px;
-  background: linear-gradient(135deg, rgba(74, 108, 247, 0.04), rgba(94, 196, 172, 0.04));
-  border: 1px solid rgba(74, 108, 247, 0.08);
-  border-radius: $radius-md;
-}
 
-.ai-tip { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
 .ai-polish-btn {
   background: linear-gradient(135deg, #4A6CF7, #5EC4AC) !important;
@@ -182,16 +165,20 @@ async function handleSubmit() {
 
 .ai-hint { font-size: $font-size-xs; color: $color-text-tertiary; }
 
-.polish-compare { display: flex; gap: 16px; align-items: flex-start; }
-.pc-col { flex: 1; min-width: 0; }
-.pc-label { font-size: $font-size-xs; font-weight: 600; color: $color-text-tertiary; margin-bottom: 8px; letter-spacing: 0.5px; }
-.pc-content { padding: 12px; border-radius: $radius-md; font-size: $font-size-base; line-height: $line-height-normal; white-space: pre-wrap; word-break: break-word; min-height: 100px; }
-.pc-content.original { background: $color-surface; color: $color-text-secondary; }
-.pc-content.polished { background: $color-primary-subtle; color: $color-text-primary; }
-.pc-arrow { padding-top: 28px; flex-shrink: 0; }
-.dialog-footer { display: flex; justify-content: flex-end; gap: 8px; }
+.polish-compare { display: flex; gap: 0; align-items: stretch; border: 1px solid $color-border-light; border-radius: $radius-lg; overflow: hidden; }
+.pc-col { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.pc-col + .pc-col { border-left: 1px solid $color-border-light; }
+.pc-label { padding: 8px 14px; font-size: $font-size-xs; font-weight: 700; color: white; letter-spacing: 1px; }
+.pc-col:first-child .pc-label { background: $color-text-tertiary; }
+.pc-col:last-child .pc-label { background: $color-primary-gradient; }
+.pc-content { flex: 1; padding: 14px; font-size: $font-size-base; line-height: $line-height-relaxed; white-space: pre-wrap; word-break: break-word; min-height: 120px; }
+.pc-content.original { background: $color-card; color: $color-text-secondary; }
+.pc-content.polished { background: rgba(74, 108, 247, 0.03); color: $color-text-primary; }
+.pc-arrow { display: none; }
+.content-toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.dialog-footer { display: flex; justify-content: flex-end; gap: 8px; padding-top: 8px; }
 
-@media (max-width: 768px) { .polish-compare { flex-direction: column; } .pc-arrow { display: none; } }
+@media (max-width: 768px) { .polish-compare { flex-direction: column; } .pc-col + .pc-col { border-left: none; border-top: 1px solid $color-border-light; } }
 
 .form-actions {
   display: flex;
