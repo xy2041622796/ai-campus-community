@@ -1,8 +1,8 @@
-<template>
+﻿<template>
   <div class="detail-page" v-if="post">
     <!-- 返回按钮 -->
     <button class="back-btn" @click="router.back()">
-      <svg $sidebar-width="16" $navbar-height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="$radius-round" stroke-linejoin="$radius-round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
       返回
     </button>
 
@@ -39,16 +39,26 @@
       <footer class="detail-footer">
         <div class="detail-actions">
           <button class="dact" :class="{ active: likeStore.isLiked(post.id) }" @click="handleLike">
-            <svg $sidebar-width="20" $navbar-height="20" viewBox="0 0 24 24" :fill="likeStore.isLiked(post.id) ? '#FF4757' : 'none'" :stroke="likeStore.isLiked(post.id) ? '#FF4757' : 'currentColor'" stroke-width="2" stroke-linecap="$radius-round" stroke-linejoin="$radius-round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" :fill="likeStore.isLiked(post.id) ? '#FF4757' : 'none'" :stroke="likeStore.isLiked(post.id) ? '#FF4757' : 'currentColor'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             <span>{{ likeCount > 0 ? likeCount : '点赞' }}</span>
           </button>
           <button class="dact" :class="{ active: favoriteStore.isFavorited(post.id) }" @click="handleFavorite">
-            <svg $sidebar-width="20" $navbar-height="20" viewBox="0 0 24 24" :fill="favoriteStore.isFavorited(post.id) ? '#F5A623' : 'none'" :stroke="favoriteStore.isFavorited(post.id) ? '#F5A623' : 'currentColor'" stroke-width="2" stroke-linecap="$radius-round" stroke-linejoin="$radius-round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" :fill="favoriteStore.isFavorited(post.id) ? '#F5A623' : 'none'" :stroke="favoriteStore.isFavorited(post.id) ? '#F5A623' : 'currentColor'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
             <span>{{ favoriteStore.isFavorited(post.id) ? '已收藏' : '收藏' }}</span>
           </button>
         </div>
       </footer>
     </article>
+
+    <!-- 评论区 -->
+    <section class="comment-section">
+      <h3 class="comment-heading">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        评论 ({{ commentStore.comments.length }})
+      </h3>
+      <CommentForm :post-id="post.id" @created="commentStore.fetchComments(post.id)" />
+      <CommentList :post-id="post.id" @reply="handleReply" />
+    </section>
   </div>
 
   <div v-else class="detail-loading">
@@ -58,14 +68,17 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { usePostStore } from '@/stores/post'
 import { useLikeStore } from '@/stores/like'
 import { useFavoriteStore } from '@/stores/favorite'
 import { useAuthStore } from '@/stores/auth'
+import { useCommentStore } from '@/stores/comment'
 import UserAvatar from '@/components/common/UserAvatar.vue'
+import CommentForm from '@/components/common/CommentForm.vue'
+import CommentList from '@/components/common/CommentList.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -73,6 +86,9 @@ const postStore = usePostStore()
 const likeStore = useLikeStore()
 const favoriteStore = useFavoriteStore()
 const authStore = useAuthStore()
+const commentStore = useCommentStore()
+
+const replyTarget = ref(null)
 
 const post = computed(() => postStore.currentPost)
 const canEdit = computed(() => authStore.user?.id === post.value?.author_id)
@@ -80,10 +96,13 @@ const likeCount = computed(() => likeStore.likeCounts[post.value?.id] || 0)
 
 onMounted(async () => {
   const p = await postStore.fetchPostById(route.params.id)
-  if (p && authStore.user?.id) {
-    await likeStore.fetchLikedPosts(authStore.user.id)
-    await likeStore.fetchLikeCount(p.id)
-    await favoriteStore.fetchFavoritedPosts(authStore.user.id)
+  if (p) {
+    if (authStore.user?.id) {
+      await likeStore.fetchLikedPosts(authStore.user.id)
+      await likeStore.fetchLikeCount(p.id)
+      await favoriteStore.fetchFavoritedPosts(authStore.user.id)
+    }
+    await commentStore.fetchComments(p.id)
   }
 })
 
@@ -92,7 +111,7 @@ function handleLike() {
   const before = likeStore.isLiked(post.value.id)
   likeStore.toggleLike(post.value.id)
   if (!before) likeStore.likeCounts[post.value.id] = (likeStore.likeCounts[post.value.id] || 0) + 1
-  else likeStore.likeCounts[post.value.id] = Math.$content-max(0, (likeStore.likeCounts[post.value.id] || 1) - 1)
+  else likeStore.likeCounts[post.value.id] = Math.max(0, (likeStore.likeCounts[post.value.id] || 1) - 1)
 }
 
 function handleFavorite() { if (post.value) favoriteStore.toggleFavorite(post.value.id) }
@@ -107,7 +126,11 @@ async function handleDelete() {
   } catch { }
 }
 
-function handleImageError(e) { e.target.style.$font-display = 'none'; e.target.parentElement.style.$font-display = 'none' }
+function handleImageError(e) { e.target.style.display = 'none'; e.target.parentElement.style.display = 'none' }
+
+function handleReply(comment) {
+  replyTarget.value = comment
+}
 
 function formatTime(dateStr) {
   const date = new Date(dateStr)
@@ -122,121 +145,53 @@ function formatTime(dateStr) {
 @keyframes pageFadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
 .back-btn {
-  $fontdisplay: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  $colorborder: $color-border;
-  $radiusborder-radius: border-radius: $radius-round;
-  $colorbackground: background: $color-card;
-  $colorcolor: color: $color-text-secondary;
-  $font-sizeborder-radius: border-radius: $radius-sm;
-  cursor: pointer;
-  $transitiontransition: transition: $transition-fast;
-  $spacingborder-radius: border-radius: $radius-md;
-
-  &:hover {
-    $colorcolor: color: $color-primary;
-    border-$colorcolor: color: $color-primary;
-    $color-primary-soft;
-  }
-
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border: $color-border; border-radius: $radius-md;
+  background: $color-card; color: $color-text-secondary; cursor: pointer; transition: $transition-fast;
+  &:hover { border-color: $color-primary; color: $color-primary; }
   svg { stroke: currentColor; }
 }
-
-.detail-card {
-  $colorbackground: background: $color-card;
-  $colorborder: $color-border;
-  border-radius: $radius-xl;
-  padding: 32px;
-}
-
+.detail-card { background: $color-card; border: $color-border; border-radius: $radius-xl; padding: 32px; }
 .detail-header {
-  $fontdisplay: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 24px;
-  padding-bottom: 20px;
-  border-bottom: $color$color$color-border-light;
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 24px; padding-bottom: 20px; border-bottom: $color-border-light;
 }
-
-.author-area { $fontdisplay: flex; align-items: center; gap: 12px; cursor: pointer; }
-.author-info { }
-.author-name { font-weight: 600; $fontfont-size: font-size: $font-size-base; $colorcolor: -textcolor: color: $color-primary; &:$shadow&:hover { $colorcolor: color: $color-primary; } }
-.meta-row { $fontdisplay: flex; align-items: center; gap: 4px; margin-top: 2px; $font-size-xs; $colorcolor: color: $color-text-tertiary; flex-wrap: wrap; }
+.author-area { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.author-name { font-weight: 600; font-size: $font-size-base; color: $color-primary; }
+.meta-row { display: flex; align-items: center; gap: 4px; margin-top: 2px; color: $color-text-tertiary; flex-wrap: wrap; }
 .meta-dot { opacity: 0.4; }
-.meta-tag { $colorcolor: color: $color-primary; font-weight: 500; }
-.author-actions { $fontdisplay: flex; gap: 8px; flex-shrink: 0; }
-
+.meta-tag { color: $color-primary; font-weight: 500; }
+.author-actions { display: flex; gap: 8px; flex-shrink: 0; }
 .detail-body { margin-bottom: 24px; }
-.detail-title { $font-display; font-size: 1.35rem; font-weight: 700; $colorcolor: -textcolor: color: $color-primary; line-height: 1.3; margin-bottom: 16px; }
-.detail-content { font-size: 1rem; $colorcolor: color: $color-text-secondary; line-height: -height-relaxed; white-space: pre-wrap; }
-
-.detail-images {
-  $fontdisplay: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-
-.detail-image-cell {
-  $radiusborder-radius: border-radius: $radius-md;
-  overflow: hidden;
-  $colorbackground: background: $color-surface;
-
-  img { $sidebar-width: 100%; max-height: 500px; object-fit: contain; $fontdisplay: block; }
-}
-
-.detail-footer {
-  padding-top: 20px;
-  border-top: $color$color$color-border-light;
-}
-
-.detail-actions {
-  $fontdisplay: flex;
-  gap: 8px;
-}
-
+.detail-title { font-family: $font-display; font-size: 1.35rem; font-weight: 700; color: $color-text-primary; line-height: 1.3; margin-bottom: 16px; }
+.detail-content { font-size: 1rem; color: $color-text-secondary; line-height: $line-height-relaxed; white-space: pre-wrap; }
+.detail-images { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+.detail-image-cell { border-radius: $radius-md; overflow: hidden; background: $color-surface; }
+.detail-image-cell img { width: 100%; max-height: 500px; object-fit: contain; display: block; }
+.detail-footer { padding-top: 20px; border-top: $color-border-light; }
+.detail-actions { display: flex; gap: 8px; }
 .dact {
-  $fontdisplay: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 18px;
-  $colorborder: $color-border;
-  $radiusborder-radius: border-radius: $radius-round;
-  $colorbackground: background: $color-card;
-  $colorcolor: color: $color-text-secondary;
-  $font-sizeborder-radius: border-radius: $radius-sm;
-  font-weight: 500;
-  cursor: pointer;
-  $transitiontransition: transition: $transition-fast;
-
-  &:$shadow&:hover { border-$colorcolor: color: $color-primary; $colorcolor: color: $color-primary; $color-primary-soft; }
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 18px; border: $color-border; border-radius: $radius-round;
+  background: $color-card; color: $color-text-secondary; font-weight: 500; cursor: pointer; transition: $transition-fast;
+  &:hover { border-color: $color-primary; color: $color-primary; }
   &:active { transform: scale(0.97); }
-
   &.active { border-color: transparent; }
-  &.active:first-child { background: rgba(255, 71, 87, 0.06); color: -heart; }
+  &.active:first-child { background: rgba(255, 71, 87, 0.06); color: $color-heart; }
   &.active:last-child { background: rgba(245, 166, 35, 0.08); color: #F5A623; }
 }
-
-.detail-loading {
-  $fontdisplay: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 0;
-  $colorcolor: color: $color-text-tertiary;
-}
-
-.dl-spinner {
-  $sidebar-width: 32px;
-  $navbar-height: 32px;
-  $colorborder: 3px solid -border;
-  border-top-$colorcolor: color: $color-primary;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  $spacingborder-radius: border-radius: $radius-md;
-}
-
+.detail-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 0; color: $color-text-tertiary; }
+.dl-spinner { width: 32px; height: 32px; border: 3px solid $color-border; border-top-color: $color-primary; border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+.comment-section {
+  margin-top: 20px; background: $color-card; border: $color-border;
+  border-radius: $radius-xl; padding: 24px 32px; display: flex; flex-direction: column; gap: 16px;
+}
+.comment-heading { display: flex; align-items: center; gap: 8px; font-size: $font-size-lg; font-weight: 600; color: $color-text-primary; margin: 0; }
+.comment-heading svg { color: $color-primary; }
+
+@media (max-width: 768px) {
+  .detail-card, .comment-section { padding: 20px; border-radius: $radius-md; }
+}
 </style>

@@ -23,7 +23,7 @@ async function handleToggle() {
 
 <style scoped>
 .fav-btn { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; padding: 4px 10px; border-radius: 16px; transition: all 0.2s; user-select: none; }
-.fav-btn:&:hover { background: #f0f5ff; }
+.fav-btn:hover { background: #f0f5ff; }
 .fav-btn.active { color: #409eff; }
 .btn-icon { font-size: 1rem; line-height: 1; }
 .btn-label { font-size: 0.85rem; color: #666; }

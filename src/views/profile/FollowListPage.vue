@@ -2,7 +2,7 @@
   <div class="follow-list-page">
     <div class="page-header">
       <button class="back-btn" @click="router.back()">
-        <svg $sidebar-width="16" $navbar-height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="$radius-round" stroke-linejoin="$radius-round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         返回
       </button>
       <h1 class="page-title">{{ isFollowers ? '粉丝' : '关注' }}</h1>
@@ -22,7 +22,7 @@
 
     <div v-else class="page-empty">
       <div class="pe-icon">
-        <svg $sidebar-width="48" $navbar-height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="$radius-round" stroke-linejoin="$radius-round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       </div>
       <p class="pe-text">{{ isFollowers ? '还没有粉丝' : '还没有关注任何人' }}</p>
     </div>
@@ -64,73 +64,73 @@ onMounted(async () => {
 @keyframes pageFadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
 .page-header {
-  $fontdisplay: flex;
+  display: flex;
   align-items: center;
   gap: 12px;
-  $spacingborder-radius: border-radius: $radius-lg;
+  border-radius: $radius-lg;
 }
 
 .back-btn {
-  $fontdisplay: inline-flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  $sidebar-width: 36px;
-  $navbar-height: 36px;
-  $colorborder: $color-border;
+  width: 36px;
+  height: 36px;
+  border: $color-border;
   border-radius: 50%;
-  $colorbackground: background: $color-card;
-  $colorcolor: color: $color-text-secondary;
+  background: $color-card;
+  color: $color-text-secondary;
   cursor: pointer;
-  $transitiontransition: transition: $transition-fast;
+  transition: $transition-fast;
 
   &:hover {
-    $colorcolor: color: $color-primary;
-    border-$colorcolor: color: $color-primary;
+    color: $color-primary;
+    border-color: $color-primary;
   }
 
   svg { stroke: currentColor; }
 }
 
 .page-title {
-  $font-display;
-  $fontfont-size: font-size: $font-size-xl;
+
+  font-size: $font-size-xl;
   font-weight: 700;
-  $colorcolor: -textcolor: color: $color-primary;
+  color: $color-primary;
 }
 
 .user-list {
-  $fontdisplay: flex;
+  display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
 .user-item {
-  $fontdisplay: flex;
+  display: flex;
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
-  $colorbackground: background: $color-card;
-  $colorborder: $color-border;
-  $radiusborder-radius: border-radius: $radius-md;
+  background: $color-card;
+  border: $color-border;
+  border-radius: $radius-md;
   cursor: pointer;
-  $transitiontransition: transition: $transition-fast;
+  transition: $transition-fast;
 
-  &:$shadow&:hover {
+  &:hover {
     border-color: transparent;
-    $shadowborder-radius: border-radius: $radius-sm;
+    border-radius: $radius-sm;
   }
 }
 
 .u-avatar {
-  $sidebar-width: 42px;
-  $navbar-height: 42px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   object-fit: cover;
 
   &.ph {
-    $color-primary-gradient;
+
     color: white;
-    $fontdisplay: flex;
+    display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 600;
@@ -139,14 +139,14 @@ onMounted(async () => {
 }
 
 .u-info { flex: 1; min-width: 0; }
-.u-name { font-weight: 600; $font-sizeborder-radius: border-radius: $radius-sm; $colorcolor: -textcolor: color: $color-primary; }
-.u-meta { $font-size-xs; $colorcolor: color: $color-text-tertiary; margin-top: 1px; }
+.u-name { font-weight: 600;  border-radius: $radius-sm; color: $color-primary; }
+.u-meta { color: $color-text-tertiary; margin-top: 1px; }
 
 .page-empty {
   text-align: center;
   padding: 80px 0;
-  $colorcolor: color: $color-text-tertiary;
-  .pe-icon { opacity: 0.4; $spacingborder-radius: border-radius: $radius-sm; }
-  .pe-text { $font-sizeborder-radius: border-radius: $radius-sm; }
+  color: $color-text-tertiary;
+  .pe-icon { opacity: 0.4; border-radius: $radius-sm; }
+  .pe-text {  border-radius: $radius-sm; }
 }
 </style>

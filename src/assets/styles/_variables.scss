@@ -16,19 +16,24 @@ $color-warm-soft: rgba(255, 179, 71, 0.1);
 $color-heart: #FF4757;
 
 // -------- Surfaces --------
-$color-surface: #F0F2F5;
+$color-surface: #F0F4F8;
 $color-card: #FFFFFF;
-$color-card-hover: #F8F9FB;
+$color-card-hover: #F7F9FC;
+$color-card-accent: linear-gradient(135deg, #4A6CF7, #5EC4AC);
+$color-primary-subtle: rgba(74, 108, 247, 0.05);
+$gradient-sidebar-user: linear-gradient(135deg, rgba(74, 108, 247, 0.04) 0%, rgba(94, 196, 172, 0.04) 100%);
+$color-accent-bar: #4A6CF7;
 
 // -------- Text --------
-$color-text-primary: #1A2332;
-$color-text-secondary: #6B7F94;
-$color-text-tertiary: #9AAABF;
+$color-text-primary: #0F1419;
+$color-text-secondary: #1A202C;
+$color-text-tertiary: #2D3748;
 $color-text-inverse: #FFFFFF;
 
 // -------- Borders --------
-$color-border: #E6EDF4;
-$color-border-light: #EEF3F8;
+$color-border: #CBD5E0;
+$color-border-light: #E2E8F0;
+$color-border-hover: #B0C0D0;
 
 // -------- Status --------
 $color-success: #34C759;
@@ -56,12 +61,12 @@ $radius-xl: 20px;
 $radius-round: 999px;
 
 // -------- Shadow --------
-$shadow-sm: 0 1px 3px rgba(26, 35, 50, 0.04);
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
 $shadow-md: 0 4px 16px rgba(26, 35, 50, 0.06);
 $shadow-lg: 0 8px 32px rgba(26, 35, 50, 0.08);
 $shadow-xl: 0 16px 48px rgba(26, 35, 50, 0.12);
 $shadow-hover: 0 8px 24px rgba(74, 108, 247, 0.10);
-$shadow-card: 0 2px 8px rgba(26, 35, 50, 0.04);
+$shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 3px 8px rgba(0, 0, 0, 0.04);
 
 // -------- Typography --------
 $font-display: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -70,7 +75,7 @@ $font-mono: 'JetBrains Mono', 'SF Mono', monospace;
 
 $font-size-xs: 0.75rem;    // 12px
 $font-size-sm: 0.8125rem;  // 13px
-$font-size-base: 0.9375rem;// 15px
+$font-size-base: 1rem;       // 16px
 $font-size-lg: 1.0625rem;  // 17px
 $font-size-xl: 1.25rem;    // 20px
 $font-size-2xl: 1.5rem;    // 24px

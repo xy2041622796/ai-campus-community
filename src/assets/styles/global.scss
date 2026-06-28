@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use './variables' as *;
 
 :root {
@@ -24,14 +25,27 @@ html, body {
   font-size: 16px;
 }
 
+/* Smooth scrolling for the whole page */
+html { scroll-behavior: smooth; }
+
+/* Better focus styles for accessibility */
+:focus-visible {
+  outline: 2px solid $color-primary;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Selection style */
+::selection { background: rgba(74, 108, 247, 0.2); color: $color-text-primary; }
+
 #app { height: 100%; }
 
-::selection { background: rgba(74, 108, 247, 0.15); color: $color-text-primary; }
+
 
 h1, h2, h3, h4, h5, h6 { font-family: $font-display; line-height: $line-height-tight; }
 
 a { text-decoration: none; color: $color-primary; transition: color 0.2s; }
-a:hover { color: darken($color-primary, 8%); }
+a:hover { color: color.adjust($color-primary, $lightness: -8%); }
 
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -69,5 +83,9 @@ a:hover { color: darken($color-primary, 8%); }
   svg { flex-shrink: 0; }
 }
 
-.el-input__wrapper { box-shadow: none !important; }
-.el-input__wrapper.is-focus { box-shadow: 0 0 0 1px $color-primary inset !important; }
+.el-input__wrapper { 
+  box-shadow: 0 0 0 1px $color-border inset !important; 
+  transition: box-shadow 0.2s ease;
+}
+.el-input__wrapper:hover { box-shadow: 0 0 0 1px $color-border-hover inset !important; }
+.el-input__wrapper.is-focus { box-shadow: 0 0 0 1.5px $color-primary inset !important; }

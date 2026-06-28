@@ -16,11 +16,11 @@
         </el-form-item>
 
         <el-form-item label="图片">
-          <ImageUploader :images="form.images" @update:images="form.images = " />
+          <ImageUploader :images="form.images" @update:images="form.images = $event" />
         </el-form-item>
 
         <el-form-item label="标签">
-          <TagSelector :tags="form.tags" @update:tags="form.tags = " />
+          <TagSelector :tags="form.tags" @update:tags="form.tags = $event" />
         </el-form-item>
 
         <el-form-item>
@@ -74,34 +74,34 @@ async function handleSubmit() {
 .edit-page { animation: pageFadeIn 0.4s ease; }
 @keyframes pageFadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
-.edit-header { $spacingborder-radius: border-radius: $radius-lg; }
+.edit-header { border-radius: $radius-lg; }
 
 .edit-title {
-  $font-display;
-  $font-size-2xl;
+
+
   font-weight: 700;
-  $colorcolor: -textcolor: color: $color-primary;
+  color: $color-primary;
   margin-bottom: 4px;
 }
 
-.edit-desc { $font-sizeborder-radius: border-radius: $radius-sm; $colorcolor: color: $color-text-secondary; }
+.edit-desc {  border-radius: $radius-sm; color: $color-text-secondary; }
 
 .edit-card {
-  $colorbackground: background: $color-card;
-  $colorborder: $color-border;
+  background: $color-card;
+  border: $color-border;
   border-radius: $radius-xl;
   padding: 32px;
 }
 
 .edit-card :deep(.el-form-item__label) {
   font-weight: 600;
-  $font-sizeborder-radius: border-radius: $radius-sm;
-  $colorcolor: -textcolor: color: $color-primary;
+   border-radius: $radius-sm;
+  color: $color-primary;
   padding-bottom: 6px;
 }
 
-.edit-card :deep(.el-input__wrapper) { $radiusborder-radius: border-radius: $radius-md; }
-.edit-card :deep(.el-textarea__inner) { $radiusborder-radius: border-radius: $radius-md; }
+.edit-card :deep(.el-input__wrapper) { border-radius: $radius-md; }
+.edit-card :deep(.el-textarea__inner) { border-radius: $radius-md; }
 
-.form-actions { $fontdisplay: flex; justify-content: flex-end; gap: 12px; padding-top: 8px; }
+.form-actions { display: flex; justify-content: flex-end; gap: 12px; padding-top: 8px; }
 </style>

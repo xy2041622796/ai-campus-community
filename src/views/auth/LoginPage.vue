@@ -4,10 +4,10 @@
       <div class="auth-side">
         <div class="auth-side-content">
           <div class="auth-brand-icon">
-            <svg $sidebar-width="64" $navbar-height="64" viewBox="0 0 64 64" fill="none">
-              <rect $sidebar-width="64" $navbar-height="64" rx="16" fill="url(#auth-grad)"/>
+            <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+              <rect width="64" height="64" rx="16" fill="url(#auth-grad)"/>
               <path d="M32 12L16 22v20l16 10 16-10V22L32 12z" fill="rgba(255,255,255,0.95)" stroke="rgba(255,255,255,0.3)" stroke-width="0.5"/>
-              <rect x="29" y="28" $sidebar-width="6" $navbar-height="12" rx="2" fill="url(#auth-grad)" opacity="0.85"/>
+              <rect x="29" y="28" width="6" height="12" rx="2" fill="url(#auth-grad)" opacity="0.85"/>
               <defs>
                 <linearGradient id="auth-grad" x1="0" y1="0" x2="64" y2="64">
                   <stop offset="0%" stop-color="#4A6CF7"/>
@@ -20,15 +20,15 @@
           <p class="auth-side-desc">AI 智能化校园交流平台 · 连接每一个校园人</p>
           <div class="auth-features">
             <div class="auth-feature">
-              <svg $sidebar-width="16" $navbar-height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="$radius-round" stroke-linejoin="$radius-round"><polyline points="20 6 9 17 4 12"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
               校园论坛 & 动态分享
             </div>
             <div class="auth-feature">
-              <svg $sidebar-width="16" $navbar-height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="$radius-round" stroke-linejoin="$radius-round"><polyline points="20 6 9 17 4 12"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
               AI 智能推荐 & 匹配
             </div>
             <div class="auth-feature">
-              <svg $sidebar-width="16" $navbar-height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="$radius-round" stroke-linejoin="$radius-round"><polyline points="20 6 9 17 4 12"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
               社团活动 & 搭子匹配
             </div>
           </div>
@@ -93,31 +93,31 @@ async function handleLogin() {
 @use '@/assets/styles/variables' as *;
 
 .login-page {
-  $sidebar-width: 100%;
+  width: 100%;
   min-height: 100vh;
-  $fontdisplay: flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #EEF2FF 0%, #E0F5F0 50%, #FEF3E8 100%);
 }
 
 .auth-wrapper {
-  $fontdisplay: flex;
-  $sidebar-width: 860px;
+  display: flex;
+  width: 860px;
   max-width: 100%;
   min-height: 560px;
-  $colorbackground: background: $color-card;
+  background: $color-card;
   border-radius: $radius-xl;
-  box-shadow: -xl;
+  box-shadow: $shadow-xl;
   overflow: hidden;
 }
 
 /* 左侧品牌展示 */
 .auth-side {
-  $sidebar-width: 380px;
+  width: 380px;
   background: linear-gradient(135deg, #4A6CF7 0%, #5EC4AC 100%);
   padding: 48px 36px;
-  $fontdisplay: flex;
+  display: flex;
   align-items: center;
   flex-shrink: 0;
   position: relative;
@@ -140,30 +140,30 @@ async function handleLogin() {
 .auth-brand-icon { margin-bottom: 20px; }
 
 .auth-side-title {
-  $font-display;
+
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 8px;
 }
 
 .auth-side-desc {
-  $font-sizeborder-radius: border-radius: $radius-sm;
+   border-radius: $radius-sm;
   opacity: 0.85;
-  line-height: -height-relaxed;
+  line-height: $line-height-relaxed;
   margin-bottom: 32px;
 }
 
 .auth-features {
-  $fontdisplay: flex;
+  display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
 .auth-feature {
-  $fontdisplay: flex;
+  display: flex;
   align-items: center;
   gap: 10px;
-  $font-sizeborder-radius: border-radius: $radius-sm;
+   border-radius: $radius-sm;
   opacity: 0.9;
 
   svg { stroke: currentColor; flex-shrink: 0; }
@@ -172,38 +172,38 @@ async function handleLogin() {
 /* 右侧表单 */
 .auth-main {
   flex: 1;
-  $fontdisplay: flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   padding: 48px;
 }
 
 .auth-container {
-  $sidebar-width: 340px;
+  width: 340px;
   max-width: 100%;
 }
 
 .auth-header { margin-bottom: 28px; }
 
 .auth-title {
-  $font-display;
+
   font-size: 1.5rem;
   font-weight: 700;
-  $colorcolor: -textcolor: color: $color-primary;
+  color: $color-primary;
   margin-bottom: 6px;
 }
 
 .auth-subtitle {
-  $font-sizeborder-radius: border-radius: $radius-sm;
-  $colorcolor: color: $color-text-secondary;
+   border-radius: $radius-sm;
+  color: $color-text-secondary;
 }
 
-.auth-form { $spacingborder-radius: border-radius: $radius-lg; }
+.auth-form { border-radius: $radius-lg; }
 
 .auth-input :deep(.el-input__wrapper) {
-  $radiusborder-radius: border-radius: $radius-md;
+  border-radius: $radius-md;
   padding: 4px 16px;
-  $navbar-height: 46px;
+  height: 46px;
 }
 
 .auth-input :deep(.el-input__prefix) {
@@ -211,29 +211,29 @@ async function handleLogin() {
 }
 
 .auth-btn {
-  $sidebar-width: 100%;
-  $navbar-height: 48px;
+  width: 100%;
+  height: 48px;
   font-size: 1rem;
   font-weight: 600;
   letter-spacing: 0.5px;
-  $radiusborder-radius: border-radius: $radius-md;
+  border-radius: $radius-md;
 }
 
 .auth-footer {
   text-align: center;
-  $colorcolor: color: $color-text-secondary;
-  $font-sizeborder-radius: border-radius: $radius-sm;
+  color: $color-text-secondary;
+   border-radius: $radius-sm;
 }
 
 .auth-link {
-  $colorcolor: color: $color-primary;
+  color: $color-primary;
   font-weight: 600;
 
   &:hover { text-decoration: underline; }
 }
 
 @media (max-width: 768px) {
-  .auth-side { $fontdisplay: none; }
+  .auth-side { display: none; }
   .auth-main { padding: 32px 24px; }
   .auth-wrapper { min-height: auto; }
 }

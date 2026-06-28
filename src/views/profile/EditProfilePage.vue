@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="edit-profile-page">
     <div class="page-header">
       <h1 class="page-title">编辑个人资料</h1>
@@ -18,14 +18,14 @@
         <el-row :gutter="16">
           <el-col :span="12">
             <el-form-item label="学院" prop="college">
-              <el-select v-model="form.college" style="$sidebar-width:100%" class="edit-input">
+              <el-select v-model="form.college" style="width:100%" class="edit-input">
                 <el-option v-for="col in colleges" :key="col" :label="col" :value="col" />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="年级" prop="grade">
-              <el-select v-model="form.grade" style="$sidebar-width:100%" class="edit-input">
+              <el-select v-model="form.grade" style="width:100%" class="edit-input">
                 <el-option v-for="g in grades" :key="g" :label="g" :value="g" />
               </el-select>
             </el-form-item>
@@ -73,7 +73,7 @@ const form = reactive({
 })
 
 const rules = {
-  nickname: [{ required: true, message: '请输入昵称', trigger: 'blur' }, { $content-max: 20, message: '昵称不超过20字', trigger: 'blur' }],
+  nickname: [{ required: true, message: '请输入昵称', trigger: 'blur' }, { max: 20, message: '昵称不超过20字', trigger: 'blur' }],
   college: [{ required: true, message: '请选择学院', trigger: 'change' }],
   grade: [{ required: true, message: '请选择年级', trigger: 'change' }]
 }
@@ -107,34 +107,34 @@ async function handleSave() {
 .edit-profile-page { animation: pageFadeIn 0.4s ease; }
 @keyframes pageFadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
-.page-header { $spacingborder-radius: border-radius: $radius-lg; }
+.page-header { border-radius: $radius-lg; }
 
 .page-title {
-  $font-display;
-  $font-size-2xl;
+
+
   font-weight: 700;
-  $colorcolor: -textcolor: color: $color-primary;
+  color: $color-primary;
   margin-bottom: 4px;
 }
 
-.page-desc { $font-sizeborder-radius: border-radius: $radius-sm; $colorcolor: color: $color-text-secondary; }
+.page-desc {  border-radius: $radius-sm; color: $color-text-secondary; }
 
 .edit-card {
-  $colorbackground: background: $color-card;
-  $colorborder: $color-border;
+  background: $color-card;
+  border: $color-border;
   border-radius: $radius-xl;
   padding: 32px;
 }
 
 .edit-card :deep(.el-form-item__label) {
   font-weight: 600;
-  $font-sizeborder-radius: border-radius: $radius-sm;
-  $colorcolor: -textcolor: color: $color-primary;
+   border-radius: $radius-sm;
+  color: $color-primary;
   padding-bottom: 6px;
 }
 
-.edit-input :deep(.el-input__wrapper) { $radiusborder-radius: border-radius: $radius-md; }
-.edit-input :deep(.el-textarea__inner) { $radiusborder-radius: border-radius: $radius-md; }
+.edit-input :deep(.el-input__wrapper) { border-radius: $radius-md; }
+.edit-input :deep(.el-textarea__inner) { border-radius: $radius-md; }
 
-.form-actions { $fontdisplay: flex; justify-content: flex-end; gap: 12px; padding-top: 8px; }
+.form-actions { display: flex; justify-content: flex-end; gap: 12px; padding-top: 8px; }
 </style>

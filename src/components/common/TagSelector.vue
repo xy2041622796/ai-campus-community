@@ -16,72 +16,72 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+
 const props = defineProps({ modelValue: { type: Array, default: () => [] }, tags: { type: Array, default: undefined } })
 const emit = defineEmits(['update:modelValue'])
 
-const tags = computed(() => props.tags ?? props.modelValue)
-import { computed } from 'vue'
-
+const effectiveTags = computed(() => props.tags ?? props.modelValue)
 const inputVal = ref('')
+
 const suggestions = ['学习', '生活', '校园', '社团', '美食', '考试', '求职', '考研', '留学', '实习', '运动', '游戏', '音乐', '摄影', '旅行']
 
 function addTag() {
   const tag = inputVal.value.trim()
-  if (tag && !tags.value.includes(tag)) emit('update:modelValue', [...tags.value, tag])
+  if (tag && !effectiveTags.value.includes(tag)) emit('update:modelValue', [...effectiveTags.value, tag])
   inputVal.value = ''
 }
 
 function removeTag(index) {
-  const newTags = [...tags.value]
+  const newTags = [...effectiveTags.value]
   newTags.splice(index, 1)
   emit('update:modelValue', newTags)
 }
 
 function selectSuggestion(s) {
-  if (!tags.value.includes(s)) emit('update:modelValue', [...tags.value, s])
+  if (!effectiveTags.value.includes(s)) emit('update:modelValue', [...effectiveTags.value, s])
 }
 </script>
 
 <style scoped lang="scss">
 @use '@/assets/styles/variables' as *;
 
-.tag-selector { $sidebar-width: 100%; }
+.tag-selector { width: 100%; }
 
 .tags-display {
-  $fontdisplay: flex;
+  display: flex;
   flex-wrap: wrap;
   gap: 6px;
   margin-bottom: 10px;
 }
 
-.tag-input-row { $fontdisplay: flex; flex-direction: column; gap: 8px; }
-.tag-input { max-width: 240px; }
+.tag-input-row { display: flex; flex-direction: column; gap: 10px; }
+.tag-input { max-width: 280px; }
 
 .tag-suggestions {
-  $fontdisplay: flex;
+  display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 6px;
 }
 
 .tag-suggestion {
-  $font-size-xs;
-  padding: 3px 10px;
-  $colorborder: $color-border;
-  $radiusborder-radius: border-radius: $radius-round;
-  $colorbackground: background: $color-card;
-  $colorcolor: color: $color-text-secondary;
+  padding: 5px 14px;
+  border: 1px solid $color-border-light;
+  border-radius: $radius-round;
+  background: $color-card;
+  color: $color-text-tertiary;
+  font-size: $font-size-sm;
   cursor: pointer;
-  $transitiontransition: transition: $transition-fast;
+  transition: all 0.15s ease;
 
   &:hover:not(:disabled) {
-    border-$colorcolor: color: $color-primary;
-    $colorcolor: color: $color-primary;
-    $color-primary-soft;
+    border-color: $color-primary;
+    color: $color-primary;
+    background: $color-primary-subtle;
   }
 
   &.used {
-    opacity: 0.4;
+    opacity: 0.35;
     cursor: not-allowed;
   }
 }

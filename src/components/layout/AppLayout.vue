@@ -26,54 +26,46 @@ import BottomNav from './BottomNav.vue'
 
 .app-layout {
   min-height: 100vh;
-  $fontdisplay: flex;
+  display: flex;
   flex-direction: column;
-  $colorbackground: background: $color-surface;
+  background: $color-surface;
 }
 
 .app-body {
-  $fontdisplay: flex;
-  $sidebar-width: 100%;
+  display: flex;
+  width: 100%;
   flex: 1;
   position: relative;
 }
 
 .app-content {
-  margin-left: -width;
+  margin-left: $sidebar-width;
   flex: 1;
-  min-height: calc(100vh - -height);
-  $fontdisplay: flex;
+  min-height: calc(100vh - $navbar-height);
+  display: flex;
   justify-content: center;
-  $spacing-lg 32px -xxl;
+  padding: 28px 32px;
 }
 
 .content-inner {
-  $sidebar-width: 100%;
-  max-width: -max;
+  width: 100%;
+  max-width: $content-max;
 }
 
-/* 页面过渡动画 */
+/* Page transition */
 .page-fade-enter-active,
 .page-fade-leave-active {
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
-
-.page-fade-enter-from {
-  opacity: 0;
-  transform: translateY(12px);
-}
-
-.page-fade-leave-to {
-  opacity: 0;
-  transform: translateY(-8px);
-}
+.page-fade-enter-from { opacity: 0; transform: translateY(8px); }
+.page-fade-leave-to { opacity: 0; transform: translateY(-4px); }
 
 @media (max-width: 1024px) {
-  .app-content { margin-left: 0; $spacingborder-radius: border-radius: $radius-md; }
+  .app-content { margin-left: 0; padding: 20px; }
   .content-inner { max-width: 100%; }
 }
 
 @media (max-width: 768px) {
-  .app-content { $spacingborder-radius: border-radius: $radius-sm; padding-bottom: calc(64px + -md); }
+  .app-content { padding: 12px; padding-bottom: calc(64px + 16px); }
 }
 </style>

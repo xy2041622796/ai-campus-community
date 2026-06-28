@@ -1,7 +1,7 @@
 <template>
-  <div class="user-avatar" :style="{ $sidebar-width: size + 'px', $navbar-height: size + 'px', fontSize: (size * 0.4) + 'px' }">
-    <img v-if="src" :src="src" :style="{ $sidebar-width: size + 'px', $navbar-height: size + 'px' }" @error="failed = true" />
-    <div v-else-if="failed || !src" class="avatar-fallback" :style="{ $sidebar-width: size + 'px', $navbar-height: size + 'px', fontSize: (size * 0.38) + 'px' }">
+  <div class="user-avatar" :style="{ width: size + 'px', height: size + 'px', fontSize: (size * 0.4) + 'px' }">
+    <img v-if="src" :src="src" :style="{ width: size + 'px', height: size + 'px' }" @error="failed = true" />
+    <div v-else-if="failed || !src" class="avatar-fallback" :style="{ width: size + 'px', height: size + 'px', fontSize: (size * 0.38) + 'px' }">
       {{ fallbackChar }}
     </div>
   </div>

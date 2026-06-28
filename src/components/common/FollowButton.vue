@@ -1,18 +1,18 @@
-<template>
+﻿<template>
   <el-button
-    :type="isFollowing ? 'default' : '$color-primary'"
+    :type="isFollowing ? 'default' : 'primary'"
     :size="size"
     :loading="loading"
     :plain="isFollowing"
-    $radius-round
+    round
     @click="handleClick"
   >
     <template v-if="!isFollowing">
-      <svg $sidebar-width="14" $navbar-height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="$radius-round" stroke-linejoin="$radius-round" style="margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       关注
     </template>
     <template v-else>
-      <svg $sidebar-width="14" $navbar-height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="$radius-round" stroke-linejoin="$radius-round" style="margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg>
       已关注
     </template>
   </el-button>
@@ -39,3 +39,4 @@ async function handleClick() {
   } finally { loading.value = false }
 }
 </script>
+

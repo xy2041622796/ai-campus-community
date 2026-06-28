@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+﻿import { createRouter, createWebHistory } from 'vue-router'
 import { supabase } from '@/api/supabase'
 
 const routes = [
@@ -12,7 +12,8 @@ const routes = [
   { path: '/settings/profile', name: 'EditProfile', component: () => import('@/views/profile/EditProfilePage.vue'), meta: { layout: 'default', requiresAuth: true } },
   { path: '/profile/:id/followers', name: 'Followers', component: () => import('@/views/profile/FollowListPage.vue'), meta: { layout: 'default', requiresAuth: true } },
   { path: '/profile/:id/following', name: 'Following', component: () => import('@/views/profile/FollowListPage.vue'), meta: { layout: 'default', requiresAuth: true } },
-  { path: '/discover', redirect: '/' },
+  { path: '/notifications', name: 'Notifications', component: () => import('@/views/notifications/NotificationsPage.vue'), meta: { layout: 'default', requiresAuth: true } },
+  { path: '/discover', name: 'Discover', component: () => import('@/views/discover/DiscoverPage.vue'), meta: { layout: 'default', requiresAuth: true } },
   { path: '/activities', redirect: '/' },
   { path: '/messages', redirect: '/' },
 ]

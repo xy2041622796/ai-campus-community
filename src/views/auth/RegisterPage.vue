@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="register-page">
     <div class="auth-wrapper">
       <div class="auth-main">
@@ -29,14 +29,14 @@
             <el-row :gutter="12">
               <el-col :span="12">
                 <el-form-item prop="college">
-                  <el-select v-model="form.college" placeholder="学院" size="large" style="$sidebar-width:100%">
+                  <el-select v-model="form.college" placeholder="学院" size="large" style="width:100%">
                     <el-option v-for="col in colleges" :key="col" :label="col" :value="col" />
                   </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="12">
                 <el-form-item prop="grade">
-                  <el-select v-model="form.grade" placeholder="年级" size="large" style="$sidebar-width:100%">
+                  <el-select v-model="form.grade" placeholder="年级" size="large" style="width:100%">
                     <el-option v-for="g in grades" :key="g" :label="g" :value="g" />
                   </el-select>
                 </el-form-item>
@@ -56,10 +56,10 @@
       <div class="auth-side">
         <div class="auth-side-content">
           <div class="auth-brand-icon">
-            <svg $sidebar-width="64" $navbar-height="64" viewBox="0 0 64 64" fill="none">
-              <rect $sidebar-width="64" $navbar-height="64" rx="16" fill="url(#auth-grad)"/>
+            <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+              <rect width="64" height="64" rx="16" fill="url(#auth-grad)"/>
               <path d="M32 12L16 22v20l16 10 16-10V22L32 12z" fill="rgba(255,255,255,0.95)" stroke="rgba(255,255,255,0.3)" stroke-width="0.5"/>
-              <rect x="29" y="28" $sidebar-width="6" $navbar-height="12" rx="2" fill="url(#auth-grad)" opacity="0.85"/>
+              <rect x="29" y="28" width="6" height="12" rx="2" fill="url(#auth-grad)" opacity="0.85"/>
               <defs>
                 <linearGradient id="auth-grad" x1="0" y1="0" x2="64" y2="64">
                   <stop offset="0%" stop-color="#4A6CF7"/>
@@ -112,7 +112,7 @@ const rules = {
   student_id: [{ required: true, message: '请输入学号', trigger: 'blur' }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }, { min: 6, message: '密码至少6位', trigger: 'blur' }],
   confirmPassword: [{ required: true, message: '请确认密码', trigger: 'blur' }, { validator: validatePass, trigger: 'blur' }],
-  nickname: [{ required: true, message: '请输入昵称', trigger: 'blur' }, { $content-max: 20, message: '昵称不超过20字', trigger: 'blur' }],
+  nickname: [{ required: true, message: '请输入昵称', trigger: 'blur' }, { max: 20, message: '昵称不超过20字', trigger: 'blur' }],
   college: [{ required: true, message: '请选择学院', trigger: 'change' }],
   grade: [{ required: true, message: '请选择年级', trigger: 'change' }]
 }
@@ -131,31 +131,31 @@ async function handleRegister() {
 @use '@/assets/styles/variables' as *;
 
 .register-page {
-  $sidebar-width: 100%;
+  width: 100%;
   min-height: 100vh;
-  $fontdisplay: flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #EEF2FF 0%, #E0F5F0 50%, #FEF3E8 100%);
 }
 
 .auth-wrapper {
-  $fontdisplay: flex;
+  display: flex;
   flex-direction: row-reverse;
-  $sidebar-width: 860px;
+  width: 860px;
   max-width: 100%;
   min-height: 600px;
-  $colorbackground: background: $color-card;
+  background: $color-card;
   border-radius: $radius-xl;
-  box-shadow: -xl;
+  box-shadow: $shadow-xl;
   overflow: hidden;
 }
 
 .auth-side {
-  $sidebar-width: 380px;
+  width: 380px;
   background: linear-gradient(135deg, #5EC4AC 0%, #4A6CF7 100%);
   padding: 48px 36px;
-  $fontdisplay: flex;
+  display: flex;
   align-items: center;
   flex-shrink: 0;
   position: relative;
@@ -178,20 +178,20 @@ async function handleRegister() {
 .auth-brand-icon { margin-bottom: 20px; }
 
 .auth-side-title {
-  $font-display;
+
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 8px;
 }
 
 .auth-side-desc {
-  $font-sizeborder-radius: border-radius: $radius-sm;
+   border-radius: $radius-sm;
   opacity: 0.85;
   margin-bottom: 36px;
 }
 
 .auth-stats {
-  $fontdisplay: flex;
+  display: flex;
   align-items: center;
   gap: 16px;
 }
@@ -202,86 +202,86 @@ async function handleRegister() {
 }
 
 .auth-stat-num {
-  $fontdisplay: block;
-  $font-display;
+  display: block;
+
   font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 2px;
 }
 
 .auth-stat-label {
-  $font-size-xs;
+
   opacity: 0.8;
 }
 
 .auth-stat-divider {
-  $sidebar-width: 1px;
-  $navbar-height: 30px;
+  width: 1px;
+  height: 30px;
   background: rgba(255,255,255,0.3);
 }
 
 .auth-main {
   flex: 1;
-  $fontdisplay: flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   padding: 48px;
 }
 
 .auth-container {
-  $sidebar-width: 400px;
+  width: 400px;
   max-width: 100%;
 }
 
 .auth-header { margin-bottom: 28px; }
 
 .auth-title {
-  $font-display;
+
   font-size: 1.5rem;
   font-weight: 700;
-  $colorcolor: -textcolor: color: $color-primary;
+  color: $color-primary;
   margin-bottom: 6px;
 }
 
 .auth-subtitle {
-  $font-sizeborder-radius: border-radius: $radius-sm;
-  $colorcolor: color: $color-text-secondary;
+   border-radius: $radius-sm;
+  color: $color-text-secondary;
 }
 
 .auth-form :deep(.el-input__wrapper) {
-  $radiusborder-radius: border-radius: $radius-md;
+  border-radius: $radius-md;
   padding: 4px 16px;
-  $navbar-height: 44px;
+  height: 44px;
 }
 
 .auth-form :deep(.el-select .el-input__wrapper) {
-  $navbar-height: 44px;
+  height: 44px;
 }
 
 .auth-btn {
-  $sidebar-width: 100%;
-  $navbar-height: 48px;
+  width: 100%;
+  height: 48px;
   font-size: 1rem;
   font-weight: 600;
   letter-spacing: 0.5px;
-  $radiusborder-radius: border-radius: $radius-md;
+  border-radius: $radius-md;
   margin-top: 4px;
 }
 
 .auth-footer {
   text-align: center;
-  $colorcolor: color: $color-text-secondary;
-  $font-sizeborder-radius: border-radius: $radius-sm;
+  color: $color-text-secondary;
+   border-radius: $radius-sm;
 }
 
 .auth-link {
-  $colorcolor: color: $color-primary;
+  color: $color-primary;
   font-weight: 600;
   &:hover { text-decoration: underline; }
 }
 
 @media (max-width: 768px) {
-  .auth-side { $fontdisplay: none; }
+  .auth-side { display: none; }
   .auth-main { padding: 32px 24px; }
   .auth-wrapper { min-height: auto; }
 }

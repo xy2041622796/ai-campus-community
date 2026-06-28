@@ -8,7 +8,7 @@
     <div class="create-card">
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
         <el-form-item label="标题" prop="title">
-          <el-input v-model="form.title" placeholder="给你的帖子起个标题..." size="large" maxlength="100" show-word-limit />
+          <el-input v-model="form.title" placeholder="给你的帖子起个标题..." size="large" maxlength="30" show-word-limit />
         </el-form-item>
 
         <el-form-item label="正文" prop="content">
@@ -16,18 +16,24 @@
         </el-form-item>
 
         <el-form-item label="图片">
-          <ImageUploader :images="form.images" @update:images="form.images = " />
+          <ImageUploader :images="form.images" @update:images="form.images = $event" />
         </el-form-item>
 
         <el-form-item label="标签">
-          <TagSelector :tags="form.tags" @update:tags="form.tags = " />
+          <TagSelector :tags="form.tags" @update:tags="form.tags = $event" />
         </el-form-item>
 
         <el-form-item>
+          <div class="form-ai-actions">
+            <el-button size="small" :loading="polishLoading" :disabled="!form.content.trim()" @click="handlePolish">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              AI 涝色
+            </el-button>
+          </div>
           <div class="form-actions">
             <el-button @click="router.back()">取消</el-button>
             <el-button type="$color-primary" :loading="submitting" @click="handleSubmit">
-              <svg $sidebar-width="16" $navbar-height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="$radius-round" stroke-linejoin="$radius-round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               发布帖子
             </el-button>
           </div>
@@ -38,21 +44,31 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { usePostStore } from '@/stores/post'
 import ImageUploader from '@/components/common/ImageUploader.vue'
 import TagSelector from '@/components/common/TagSelector.vue'
+import { useAIStore } from '@/stores/ai'
 
 const router = useRouter()
 const postStore = usePostStore()
 const formRef = ref(null)
 const submitting = ref(false)
+const aiStore = useAIStore()
+const polishLoading = computed(() => aiStore.polishing)
+const charCount = computed(() => form.content.length)
 const form = reactive({ title: '', content: '', images: [], tags: [] })
 const rules = {
   title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
   content: [{ required: true, message: '请输入正文内容', trigger: 'blur' }],
+}
+
+async function handlePolish() {
+  if (!form.content.trim()) return
+  const result = await aiStore.polishContent(form.content)
+  if (result) form.content = result
 }
 
 async function handleSubmit() {
@@ -74,46 +90,36 @@ async function handleSubmit() {
 .create-page { animation: pageFadeIn 0.4s ease; }
 @keyframes pageFadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
-.create-header { $spacingborder-radius: border-radius: $radius-lg; }
-
-.create-title {
-  $font-display;
-  $font-size-2xl;
-  font-weight: 700;
-  $colorcolor: -textcolor: color: $color-primary;
-  margin-bottom: 4px;
-}
-
-.create-desc {
-  $font-sizeborder-radius: border-radius: $radius-sm;
-  $colorcolor: color: $color-text-secondary;
-}
+.create-header { margin-bottom: 24px; }
+.create-title { font-family: $font-display; font-size: $font-size-xl; font-weight: 700; color: $color-text-primary; margin-bottom: 4px; }
+.create-desc { font-size: $font-size-sm; color: $color-text-tertiary; }
 
 .create-card {
-  $colorbackground: background: $color-card;
-  $colorborder: $color-border;
+  background: $color-card;
+  border: 1px solid $color-border-light;
   border-radius: $radius-xl;
   padding: 32px;
 }
 
 .create-card :deep(.el-form-item__label) {
   font-weight: 600;
-  $font-sizeborder-radius: border-radius: $radius-sm;
-  $colorcolor: -textcolor: color: $color-primary;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
   padding-bottom: 6px;
 }
 
-.create-card :deep(.el-input__wrapper) {
-  $radiusborder-radius: border-radius: $radius-md;
-}
+.create-card :deep(.el-input__wrapper) { border-radius: $radius-md; }
+.create-card :deep(.el-textarea__inner) { border-radius: $radius-md; min-height: 140px; }
 
-.create-card :deep(.el-textarea__inner) {
-  $radiusborder-radius: border-radius: $radius-md;
-  min-height: 140px;
+.form-actions {
+.form-ai-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
 .form-actions {
-  $fontdisplay: flex;
+  display: flex;
   justify-content: flex-end;
   gap: 12px;
   padding-top: 8px;

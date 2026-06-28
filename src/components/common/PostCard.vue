@@ -14,7 +14,7 @@
         </div>
       </div>
       <button class="card-more" @click.stop>
-        <svg $sidebar-width="16" $navbar-height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="$radius-round" stroke-linejoin="$radius-round">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/>
         </svg>
       </button>
@@ -44,21 +44,21 @@
     <!-- 操作栏 -->
     <div class="card-footer">
       <button class="action-btn like-btn" :class="{ active: likeStore.isLiked(post.id) }" @click.stop="handleLike">
-        <svg $sidebar-width="18" $navbar-height="18" viewBox="0 0 24 24" :fill="likeStore.isLiked(post.id) ? '#FF4757' : 'none'" :stroke="likeStore.isLiked(post.id) ? '#FF4757' : 'currentColor'" stroke-width="2" stroke-linecap="$radius-round" stroke-linejoin="$radius-round">
+        <svg width="18" height="18" viewBox="0 0 24 24" :fill="likeStore.isLiked(post.id) ? '#FF4757' : 'none'" :stroke="likeStore.isLiked(post.id) ? '#FF4757' : 'currentColor'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
         </svg>
         <span class="action-label">{{ likeCount > 0 ? likeCount : '点赞' }}</span>
       </button>
 
       <button class="action-btn" @click.stop>
-        <svg $sidebar-width="18" $navbar-height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="$radius-round" stroke-linejoin="$radius-round">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
         </svg>
         <span class="action-label">{{ 0 > 0 ? 0 : '评论' }}</span>
       </button>
 
       <button class="action-btn fav-btn" :class="{ active: favoriteStore.isFavorited(post.id) }" @click.stop="handleFavorite">
-        <svg $sidebar-width="18" $navbar-height="18" viewBox="0 0 24 24" :fill="favoriteStore.isFavorited(post.id) ? '#F5A623' : 'none'" :stroke="favoriteStore.isFavorited(post.id) ? '#F5A623' : 'currentColor'" stroke-width="2" stroke-linecap="$radius-round" stroke-linejoin="$radius-round">
+        <svg width="18" height="18" viewBox="0 0 24 24" :fill="favoriteStore.isFavorited(post.id) ? '#F5A623' : 'none'" :stroke="favoriteStore.isFavorited(post.id) ? '#F5A623' : 'currentColor'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
         </svg>
         <span class="action-label">收藏</span>
@@ -91,12 +91,12 @@ function handleLike() {
   const before = likeStore.isLiked(props.post.id)
   likeStore.toggleLike(props.post.id)
   if (!before) likeStore.likeCounts[props.post.id] = (likeStore.likeCounts[props.post.id] || 0) + 1
-  else likeStore.likeCounts[props.post.id] = Math.$content-max(0, (likeStore.likeCounts[props.post.id] || 1) - 1)
+  else likeStore.likeCounts[props.post.id] = Math.max(0, (likeStore.likeCounts[props.post.id] || 1) - 1)
 }
 
 function handleFavorite() { favoriteStore.toggleFavorite(props.post.id) }
 
-function handleImageError(e) { e.target.style.$font-display = 'none'; e.target.parentElement.style.$font-display = 'none' }
+function handleImageError(e) { e.target.style.display = 'none'; e.target.parentElement.style.display = 'none' }
 
 function formatTime(dateStr) {
   const date = new Date(dateStr)
@@ -115,118 +115,96 @@ function formatTime(dateStr) {
 @use '@/assets/styles/variables' as *;
 
 .post-card {
-  $colorbackground: background: $color-card;
-  $colorborder: $color-border;
-  $radiusborder-radius: border-radius: $radius-lg;
-  padding: 20px 20px 12px;
-  cursor: pointer;
-  $transitiontransition: transition: $transition-normal;
-  animation: cardSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  background: $color-card;
+  border: 1px solid $color-border-light;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  padding: 20px 20px 20px 24px;
+  transition: all 0.2s ease;
+  position: relative;
+
+  /* Card accent bar */
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 16px;
+    bottom: 16px;
+    width: 4px;
+    background: $color-primary-gradient;
+    border-radius: 0 3px 3px 0;
+    opacity: 0.3;
+    transition: opacity 0.2s ease;
+  }
 
   &:hover {
-    border-color: transparent;
-    $shadow-hover;
-    transform: translateY(-2px);
+    box-shadow: $shadow-hover;
+    border-color: $color-border;
+    transform: translateY(-1px);
+    &::before { opacity: 1; }
   }
 }
 
-@keyframes cardSlideIn {
-  from { opacity: 0; transform: translateY(20px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-/* Header */
-.card-header {
-  $fontdisplay: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 14px;
-}
-
 .author-area {
-  $fontdisplay: flex;
+  display: flex;
   align-items: center;
   gap: 10px;
-  flex: 1;
-  min-width: 0;
+  margin-bottom: 12px;
+  cursor: pointer;
 }
 
 .author-info { flex: 1; min-width: 0; }
 
 .author-name {
   font-weight: 600;
-  $font-sizeborder-radius: border-radius: $radius-sm;
-  $colorcolor: -textcolor: color: $color-primary;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-
-  &:$shadow&:hover { $colorcolor: color: $color-primary; }
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  &:hover { color: $color-primary; }
 }
 
 .meta-row {
-  $fontdisplay: flex;
+  display: flex;
   align-items: center;
   gap: 4px;
   margin-top: 2px;
-  $font-size-xs;
-  $colorcolor: color: $color-text-tertiary;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
 }
 
 .meta-dot { opacity: 0.4; }
-.meta-tag { $colorcolor: color: $color-primary; font-weight: 500; }
+.meta-tag { color: $color-primary; font-weight: 500; }
 
-.card-more {
-  $fontdisplay: flex;
-  align-items: center;
-  justify-content: center;
-  $sidebar-width: 28px;
-  $navbar-height: 28px;
-  $colorborder: none;
-  border-radius: 6px;
-  background: transparent;
-  $colorcolor: color: $color-text-tertiary;
-  cursor: pointer;
-  flex-shrink: 0;
-  $transitiontransition: transition: $transition-fast;
-
-  &:$shadow&:hover { $colorbackground: background: $color-surface; $colorcolor: -textcolor: color: $color-primary; }
-}
-
-/* Body */
-.card-body { margin-bottom: 14px; }
+.card-body { margin-bottom: 12px; }
 
 .card-title {
-  $font-display;
+  font-family: $font-display;
   font-size: 1.05rem;
   font-weight: 650;
-  $colorcolor: -textcolor: color: $color-primary;
-  line-height: -height-tight;
+  color: $color-text-primary;
+  line-height: $line-height-tight;
   margin-bottom: 6px;
-  $fontdisplay: -webkit-box;
+  display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
 .card-desc {
-  $fontfont-size: font-size: $font-size-base;
-  $colorcolor: color: $color-text-secondary;
-  line-height: -height-relaxed;
-  $fontdisplay: -webkit-box;
+  font-size: $font-size-base;
+  color: $color-text-tertiary;
+  line-height: $line-height-normal;
+  display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-/* Media */
 .card-media {
-  $fontdisplay: grid;
+  display: grid;
   gap: 3px;
-  margin-bottom: 14px;
-  $radiusborder-radius: border-radius: $radius-md;
+  margin-bottom: 12px;
+  border-radius: $radius-md;
   overflow: hidden;
-
   &.grid-1 { grid-template-columns: 1fr; }
   &.grid-2 { grid-template-columns: 1fr 1fr; }
   &.grid-3 { grid-template-columns: 1fr 1fr 1fr; }
@@ -235,61 +213,45 @@ function formatTime(dateStr) {
 .media-cell {
   aspect-ratio: 16/9;
   overflow: hidden;
-  $colorbackground: background: $color-surface;
+  background: $color-surface;
   border-radius: 2px;
-
   &.single { aspect-ratio: 16/9; max-height: 300px; }
-
-  img {
-    $sidebar-width: 100%;
-    $navbar-height: 100%;
-    object-fit: cover;
-    transition: transform 0.35s ease;
-  }
-
-  &:$shadow-hover img { transform: scale(1.08); }
+  img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.35s ease; }
+  &:hover img { transform: scale(1.08); }
 }
 
 .media-more {
-  $fontdisplay: flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(0,0,0,0.04);
   position: relative;
-
-  .more-count {
-    font-size: 1.2rem;
-    font-weight: 700;
-    $colorcolor: color: $color-text-secondary;
-  }
+  .more-count { font-size: 1.2rem; font-weight: 700; color: $color-text-tertiary; }
 }
 
-/* Footer */
 .card-footer {
-  $fontdisplay: flex;
+  display: flex;
   align-items: center;
   gap: 4px;
   padding-top: 12px;
-  border-top: $color$color$color-border-light;
+  border-top: 1px solid $color-border-light;
 }
 
 .action-btn {
-  $fontdisplay: inline-flex;
+  display: inline-flex;
   align-items: center;
   gap: 5px;
   background: none;
-  $colorborder: none;
+  border: none;
   padding: 6px 12px;
   border-radius: 8px;
   cursor: pointer;
-  $font-sizeborder-radius: border-radius: $radius-sm;
-  $colorcolor: color: $color-text-tertiary;
-  $transitiontransition: transition: $transition-fast;
-
-  &:$shadow&:hover { $color-primary-soft; $colorcolor: color: $color-primary; }
+  color: $color-text-tertiary;
+  font-size: $font-size-sm;
+  transition: $transition-fast;
+  &:hover { background: $color-primary-subtle; color: $color-primary; }
   &:active { transform: scale(0.92); }
-
-  &.like-btn.active { color: -heart; background: rgba(255, 71, 87, 0.06); }
+  &.like-btn.active { color: $color-heart; background: rgba(255, 71, 87, 0.06); }
   &.fav-btn.active { color: #F5A623; background: rgba(245, 166, 35, 0.08); }
 }
 

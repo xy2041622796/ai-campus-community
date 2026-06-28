@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div id="app-root">
     <template v-if="!route.meta.layout || route.meta.layout === 'default'">
       <AppLayout />
@@ -17,22 +17,25 @@
 import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useNotificationStore } from '@/stores/notification'
 import AppLayout from '@/components/layout/AppLayout.vue'
 
 const route = useRoute()
 const authStore = useAuthStore()
+const notifStore = useNotificationStore()
 
-onMounted(() => { authStore.initSession() })
+onMounted(() => { authStore.initSession()
+  notifStore.fetchNotifications() })
 </script>
 
 <style scoped lang="scss">
 @use '@/assets/styles/variables' as *;
 
-#app-root { $navbar-height: 100%; }
+#app-root { height: 100%; }
 
 .auth-wrapper {
   min-height: 100vh;
-  $fontdisplay: flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #EEF2FF 0%, #E0F5F0 50%, #FEF3E8 100%);
@@ -46,3 +49,5 @@ onMounted(() => { authStore.initSession() })
 .auth-fade-enter-from { opacity: 0; transform: scale(0.96); }
 .auth-fade-leave-to { opacity: 0; transform: scale(0.96); }
 </style>
+
+
