@@ -33,6 +33,17 @@
           </div>
         </div>
 
+        <div class="detail-participants" v-if="participants.length">
+          <div class="dp-label">已报名用户 ({{ participants.length }})</div>
+          <div class="dp-list">
+            <div v-for="p in participants" :key="p.id" class="dp-item" @click="router.push('/profile/' + p.user_id)">
+              <img v-if="p.profile?.avatar_url" :src="p.profile.avatar_url" class="dp-avatar" />
+              <div v-else class="dp-avatar dp-ph">{{ (p.profile?.nickname || '?')[0] }}</div>
+              <span class="dp-name">{{ p.profile?.nickname || '未知用户' }}</span>
+            </div>
+          </div>
+        </div>
+
         <div class="detail-actions">
           <div class="da-info">
             <span v-if="event.max_participants > 0">{{ participantCount }}/{{ event.max_participants }} 人已报名</span>
@@ -76,6 +87,7 @@ const actionLoading = ref(false)
 const event = computed(() => store.currentEvent)
 const isRegistered = computed(() => event.value ? store.registeredIds.has(event.value.id) : false)
 const participantCount = ref(0)
+const participants = ref([])
 
 function statusLabel(s) {
   const map = { open: '开始报名', closed: '报名已结束', cancelled: '已取消', completed: '已结束' }
@@ -111,6 +123,12 @@ onMounted(async () => {
   if (event.value) {
     const { count } = await supabase.rpc('get_event_participant_count', { event_id: event.value.id })
     participantCount.value = count || 0
+    const { data: pData } = await supabase
+      .from('event_participants')
+      .select('id, user_id, profile:user_id(id, nickname, avatar_url)')
+      .eq('event_id', event.value.id)
+      .eq('status', 'registered')
+    participants.value = pData || []
   }
 })
 </script>
@@ -142,8 +160,14 @@ onMounted(async () => {
 .do-ph { display: flex; align-items: center; justify-content: center; background: $color-primary-gradient; color: white; font-weight: 600; }
 .do-name { font-weight: 600; color: $color-text-primary; }
 .do-label { font-size: $font-size-xs; color: $color-text-tertiary; }
+.dp-label { font-size: $font-size-sm; font-weight: 600; color: $color-text-primary; margin-bottom: 8px; }
+.dp-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.dp-item { display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 4px 8px; border-radius: $radius-round; background: $color-card; font-size: $font-size-sm; transition: $transition-fast; }
+.dp-item:hover { background: $color-primary-subtle; }
+.dp-avatar { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
+.dp-ph { display: flex; align-items: center; justify-content: center; background: $color-primary-gradient; color: white; font-size: 0.6rem; font-weight: 600; }
 
-.detail-actions { display: flex; align-items: center; justify-content: space-between; padding-top: 16px; border-top: 1px solid $color-border-light; }
+.detail-participants { padding: 12px; background: $color-primary-subtle; border-radius: $radius-md; }
 .da-info { font-size: $font-size-sm; color: $color-text-tertiary; }
 .da-buttons { display: flex; gap: 8px; }
 .da-deadline { color: $color-text-tertiary; }
