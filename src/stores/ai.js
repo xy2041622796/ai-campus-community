@@ -32,9 +32,9 @@ export const useAIStore = defineStore('ai', () => {
       console.error('[AI] error:', e)
       if (e.name === 'TypeError' && e.message.includes('fetch')) {
         ElMessage.error('网络连接失败，请检查网络或梯子是否正常')
-      } else 
+      } else {
         ElMessage.error(e.message || '服务失败')
-      ElMessage.error(e.message || '服务失败')
+      }
       return text
     } finally {
       polishing.value = false
