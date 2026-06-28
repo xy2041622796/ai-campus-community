@@ -26,6 +26,17 @@ export default defineConfig({
       '/api': {
         target: process.env.VITE_VERCEL_URL || 'https://ai-campus-community-qu8lzkjjp-xy123.vercel.app',
         changeOrigin: true
+      },
+      '/agnes': {
+        target: 'https://apihub.agnes-ai.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/agnes/, ''),
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            const key = process.env.AGNES_API_KEY || process.env.VITE_AGNES_KEY
+            if (key) proxyReq.setHeader('Authorization', 'Bearer ' + key)
+          })
+        }
       }
     }
   }

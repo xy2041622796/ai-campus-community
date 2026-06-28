@@ -11,9 +11,9 @@ export const useAIStore = defineStore('ai', () => {
     polishing.value = true
     try {
       const apiKey = import.meta.env.VITE_AGNES_KEY
-      const res = await fetch('https://apihub.agnes-ai.com/v1/chat/completions', {
+      const res = await fetch('/agnes/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: 'agnes-2.0-flash',
           messages: [
@@ -35,11 +35,9 @@ export const useAIStore = defineStore('ai', () => {
       console.error('[AI] error:', e)
       if (e.name === 'TypeError' && e.message.includes('fetch')) {
         ElMessage.error('网络连接失败，请检查网络或梯子是否正常')
-      } else if (!import.meta.env.VITE_AGNES_KEY) {
-        ElMessage.error('请在.env中配置VITE_AGNES_KEY')
-      } else {
+      } else 
         ElMessage.error(e.message || '服务失败')
-      }
+      ElMessage.error(e.message || '服务失败')
       return text
     } finally {
       polishing.value = false
@@ -50,9 +48,9 @@ export const useAIStore = defineStore('ai', () => {
     suggesting.value = true
     try {
       const apiKey = import.meta.env.VITE_AGNES_KEY
-      const res = await fetch('https://apihub.agnes-ai.com/v1/chat/completions', {
+      const res = await fetch('/agnes/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: 'agnes-2.0-flash',
           messages: [
