@@ -14,8 +14,9 @@ const routes = [
   { path: '/profile/:id/following', name: 'Following', component: () => import('@/views/profile/FollowListPage.vue'), meta: { layout: 'default', requiresAuth: true } },
   { path: '/notifications', name: 'Notifications', component: () => import('@/views/notifications/NotificationsPage.vue'), meta: { layout: 'default', requiresAuth: true } },
   { path: '/discover', name: 'Discover', component: () => import('@/views/discover/DiscoverPage.vue'), meta: { layout: 'default', requiresAuth: true } },
-  { path: '/activities', redirect: '/' },
-  { path: '/messages', redirect: '/' },
+  { path: '/people', name: 'People', component: () => import('@/views/discover/PeoplePage.vue'), meta: { layout: 'default', requiresAuth: true } },
+  { path: '/activities', name: 'Activities', component: () => import('@/views/activities/ActivitiesPage.vue'), meta: { layout: 'default', requiresAuth: true } },
+  { path: '/messages', redirect: '/notifications' },
 ]
 
 const router = createRouter({ history: createWebHistory(), routes })
