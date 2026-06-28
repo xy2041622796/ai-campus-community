@@ -22,6 +22,7 @@ import BottomNav from './BottomNav.vue'
 </script>
 
 <style scoped lang="scss">
+@use '@/assets/styles/variables' as *;
 .app-layout {
   height: 100vh;
   display: flex;
