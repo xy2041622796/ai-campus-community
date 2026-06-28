@@ -17,7 +17,7 @@ export const useAIStore = defineStore('ai', () => {
         body: JSON.stringify({
           model: 'agnes-2.0-flash',
           messages: [
-            { role: 'user', content: '请帮我润色以下文字，使其更通顺更吸引人，保持原意和风格：\n\n' + text }
+            { role: 'user', content: '直接返回润色后的文字，只返回一个版本，不要解释，不要夗选项，不要询问问题。保持原意和风格，只优化表达。文字如下：\n' + text }
           ]
         })
       })
