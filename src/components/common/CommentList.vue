@@ -19,7 +19,7 @@
             </div>
             <div class="ci-content">{{ comment.content }}</div>
             <div class="ci-footer">
-              <button class="ci-reply-btn" @click="('reply', comment)">回复</button>
+              <button class="ci-reply-btn" @click="$emit('reply', comment)">回复</button>
               <button v-if="canDelete(comment)" class="ci-del-btn" @click="handleDelete(comment.id)">删除</button>
             </div>
           </div>
@@ -38,7 +38,7 @@
               </div>
               <div class="ci-content">{{ reply.content }}</div>
               <div class="ci-footer">
-                <button class="ci-reply-btn" @click="('reply', reply)">回复</button>
+                <button class="ci-reply-btn" @click="$emit('reply', reply)">回复</button>
                 <button v-if="canDelete(reply)" class="ci-del-btn" @click="handleDelete(reply.id)">删除</button>
               </div>
             </div>

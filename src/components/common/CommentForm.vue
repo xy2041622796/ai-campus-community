@@ -10,7 +10,7 @@
       resize="none"
     />
     <div class="cf-actions">
-      <button v-if="replyTo" class="cf-cancel" @click="('cancelReply')">取消回复</button>
+      <button v-if="replyTo" class="cf-cancel" @click="$emit('cancelReply')">取消回复</button>
       <button class="cf-submit" :disabled="!content.trim() || submitting" @click="handleSubmit">
         {{ submitting ? '发布中...' : '发布评论' }}
       </button>

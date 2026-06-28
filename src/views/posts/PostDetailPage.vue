@@ -56,7 +56,11 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         评论 ({{ commentStore.comments.length }})
       </h3>
-      <CommentForm :post-id="post.id" @created="commentStore.fetchComments(post.id)" />
+      <div v-if="replyTo" class="reply-indicator">
+        <span>回复复 @{{ replyTo.author?.nickname }}</span>
+        <button @click="cancelReply">取消回复</button>
+      </div>
+      <CommentForm :post-id="post.id" :reply-to="replyTo?.author?.nickname" :parent-id="replyTo?.id" @created="onCommentCreated" @cancel-reply="cancelReply" />
       <CommentList :post-id="post.id" @reply="handleReply" />
     </section>
   </div>
@@ -90,7 +94,7 @@ const favoriteStore = useFavoriteStore()
 const authStore = useAuthStore()
 const commentStore = useCommentStore()
 
-const replyTarget = ref(null)
+const replyTo = ref(null)
 
 const post = computed(() => postStore.currentPost)
 const canEdit = computed(() => authStore.user?.id === post.value?.author_id)
@@ -131,7 +135,16 @@ async function handleDelete() {
 function handleImageError(e) { e.target.style.display = 'none'; e.target.parentElement.style.display = 'none' }
 
 function handleReply(comment) {
-  replyTarget.value = comment
+  replyTo.value = comment
+}
+
+function cancelReply() {
+  replyTo.value = null
+}
+
+function onCommentCreated() {
+  replyTo.value = null
+  commentStore.fetchComments(post.value.id)
 }
 
 const previewVisible = ref(false)
@@ -197,7 +210,20 @@ function formatTime(dateStr) {
   border-radius: $radius-xl; padding: 24px 32px; display: flex; flex-direction: column; gap: 16px;
 }
 .comment-heading { display: flex; align-items: center; gap: 8px; font-size: $font-size-lg; font-weight: 600; color: $color-text-primary; margin: 0; }
+.comment-heading { display: flex; align-items: center; gap: 8px; font-size: $font-size-lg; font-weight: 600; color: $color-text-primary; margin: 0; }
 .comment-heading svg { color: $color-primary; }
+.comment-count { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 6px; font-size: $font-size-xs; font-weight: 600; color: white; background: $color-primary-gradient; border-radius: $radius-round; }
+
+/* Reply indicator */
+.reply-indicator {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 14px; background: $color-primary-subtle; border-radius: $radius-md;
+  font-size: $font-size-sm; color: $color-primary;
+}
+.reply-indicator button {
+  background: none; border: none; color: $color-text-tertiary; cursor: pointer; font-size: $font-size-xs;
+  &:hover { color: $color-danger; }
+}
 
 @media (max-width: 768px) {
   .detail-card, .comment-section { padding: 20px; border-radius: $radius-md; }
