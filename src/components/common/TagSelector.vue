@@ -1,13 +1,13 @@
 <template>
   <div class="tag-selector">
     <div class="tags-display">
-      <el-tag v-for="(tag, i) in modelValue" :key="i" closable :disable-transitions="false" @close="removeTag(i)">{{ tag }}</el-tag>
+      <el-tag v-for="(tag, i) in effectiveTags" :key="i" closable :disable-transitions="false" @close="removeTag(i)">{{ tag }}</el-tag>
     </div>
     <div class="tag-input-row">
       <el-input v-model="inputVal" placeholder="输入标签并按回车添加" size="small" class="tag-input" @keyup.enter="addTag" />
       <div class="tag-suggestions">
-        <button v-for="s in suggestions" :key="s" type="button" class="tag-suggestion" :class="{ used: modelValue.includes(s) }"
-          :disabled="modelValue.includes(s)" @click="selectSuggestion(s)">
+        <button v-for="s in suggestions" :key="s" type="button" class="tag-suggestion" :class="{ used: effectiveTags.includes(s) }"
+          :disabled="effectiveTags.includes(s)" @click="selectSuggestion(s)">
           {{ s }}
         </button>
       </div>
