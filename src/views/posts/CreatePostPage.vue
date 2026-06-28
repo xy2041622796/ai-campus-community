@@ -26,11 +26,11 @@
         <el-form-item>
           <div class="form-ai-actions">
             <div class="ai-tip">
-              <el-button size="small" class="ai-polish-btn" :loading="polishLoading" :disabled="!form.content.trim()" @click="handlePolish">
+              <el-button size="small" class="ai-polish-btn" :loading="polishLoading"  @click="handlePolish">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                 AI 涝色
               </el-button>
-              <span class="ai-hint">让你优化表辑表辑又达达</span>
+              <span class="ai-hint" v-if="!form.content.trim()">请先填写正文</span><span class="ai-hint" v-else>让你优化表辑表辑又达达</span>
             </div>
           </div>
           <div class="form-actions">
@@ -69,6 +69,7 @@ const rules = {
 }
 
 async function handlePolish() {
+  if (!form.content.trim()) { ElMessage.info('请先填写正文内容'); return }
   if (!form.content.trim()) return
   const result = await aiStore.polishContent(form.content)
   if (result) form.content = result

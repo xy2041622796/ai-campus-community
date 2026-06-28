@@ -163,6 +163,7 @@ function removeImage(index) {
   height: 120px;
   border-radius: $radius-lg;
   overflow: hidden;
+  border: 2px solid $color-border-light;
 
   img { width: 100%; height: 100%; object-fit: cover; }
 }
@@ -174,7 +175,7 @@ function removeImage(index) {
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0;
+  opacity: 0 !important;
   transition: opacity 0.2s;
   cursor: pointer;
 }
