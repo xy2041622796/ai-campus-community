@@ -25,10 +25,13 @@
 
         <el-form-item>
           <div class="form-ai-actions">
-            <el-button size="small" :loading="polishLoading" :disabled="!form.content.trim()" @click="handlePolish">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-              AI 涝色
-            </el-button>
+            <div class="ai-tip">
+              <el-button size="small" class="ai-polish-btn" :loading="polishLoading" :disabled="!form.content.trim()" @click="handlePolish">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                AI 涝色
+              </el-button>
+              <span class="ai-hint">让你优化表辑表辑又达达</span>
+            </div>
           </div>
           <div class="form-actions">
             <el-button @click="router.back()">取消</el-button>
@@ -113,9 +116,31 @@ async function handleSubmit() {
 
 .form-ai-actions {
   display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, rgba(74, 108, 247, 0.04), rgba(94, 196, 172, 0.04));
+  border: 1px solid rgba(74, 108, 247, 0.08);
+  border-radius: $radius-md;
 }
+
+.ai-tip { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+.ai-polish-btn {
+  background: linear-gradient(135deg, #4A6CF7, #5EC4AC) !important;
+  border: none !important;
+  color: white !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.3px !important;
+  box-shadow: 0 2px 8px rgba(74, 108, 247, 0.2) !important;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  &:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(74, 108, 247, 0.35) !important; }
+  &:active { transform: translateY(0) !important; }
+  svg { stroke: currentColor; }
+}
+
+.ai-hint { font-size: $font-size-xs; color: $color-text-tertiary; }
 
 .form-actions {
   display: flex;
