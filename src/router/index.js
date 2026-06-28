@@ -20,6 +20,7 @@ const routes = [
   { path: '/activities', name: 'Activities', component: () => import('@/views/activities/ActivitiesPage.vue'), meta: { layout: 'default', requiresAuth: true } },
   { path: '/events', name: 'Events', component: () => import('@/views/events/EventsPage.vue'), meta: { layout: 'default', requiresAuth: true } },
   { path: '/events/new', name: 'CreateEvent', component: () => import('@/views/events/CreateEventPage.vue'), meta: { layout: 'default', requiresAuth: true } },
+  { path: '/events/:id/edit', name: 'EditEvent', component: () => import('@/views/events/EditEventPage.vue'), meta: { layout: 'default', requiresAuth: true } },
   { path: '/events/:id', name: 'EventDetail', component: () => import('@/views/events/EventDetailPage.vue'), meta: { layout: 'default', requiresAuth: true } },
 
   { path: '/messages', redirect: '/notifications' },

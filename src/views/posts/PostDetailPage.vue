@@ -65,6 +65,7 @@
     <div class="dl-spinner"></div>
     <p>加载中...</p>
   </div>
+  <ImagePreview :src="previewSrc" :visible="previewVisible" :images="post?.images" v-model:current-index="previewIndex" @close="previewVisible = false" />
 </template>
 
 <script setup>
@@ -79,6 +80,7 @@ import { useCommentStore } from '@/stores/comment'
 import UserAvatar from '@/components/common/UserAvatar.vue'
 import CommentForm from '@/components/common/CommentForm.vue'
 import CommentList from '@/components/common/CommentList.vue'
+import ImagePreview from '@/components/common/ImagePreview.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -131,6 +133,12 @@ function handleImageError(e) { e.target.style.display = 'none'; e.target.parentE
 function handleReply(comment) {
   replyTarget.value = comment
 }
+
+const previewVisible = ref(false)
+const previewSrc = ref('')
+const previewIndex = ref(0)
+
+function openImage(src, idx) { previewSrc.value = src; previewIndex.value = idx; previewVisible.value = true }
 
 function formatTime(dateStr) {
   const date = new Date(dateStr)

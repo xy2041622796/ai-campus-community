@@ -39,12 +39,15 @@
             <span v-else>{{ participantCount }} 人已报名</span>
             <span v-if="event.deadline" class="da-deadline"> · {{ formatDate(event.deadline) }} 截止</span>
           </div>
-          <el-button
-            v-if="event.status === 'open'"
-            :type="isRegistered ? 'default' : 'primary'"
-            :loading="actionLoading"
-            @click="handleToggleJoin"
-          >{{ isRegistered ? '取消报名' : '立即报名' }}</el-button>
+          <div class="da-buttons">
+            <el-button
+              v-if="event.status === 'open'"
+              :type="isRegistered ? 'default' : 'primary'"
+              :loading="actionLoading"
+              @click="handleToggleJoin"
+            >{{ isRegistered ? '取消报名' : '立即报名' }}</el-button>
+            <el-button v-if="authStore.user?.id === event.organizer_id" size="small" @click="router.push('/events/' + event.id + '/edit')">编辑</el-button>
+          </div>
         </div>
       </div>
     </div>
@@ -61,11 +64,13 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useEventStore } from '@/stores/event'
+import { useAuthStore } from '@/stores/auth'
 import { supabase } from '@/api/supabase'
 
 const route = useRoute()
 const router = useRouter()
 const store = useEventStore()
+const authStore = useAuthStore()
 const actionLoading = ref(false)
 
 const event = computed(() => store.currentEvent)
@@ -140,6 +145,7 @@ onMounted(async () => {
 
 .detail-actions { display: flex; align-items: center; justify-content: space-between; padding-top: 16px; border-top: 1px solid $color-border-light; }
 .da-info { font-size: $font-size-sm; color: $color-text-tertiary; }
+.da-buttons { display: flex; gap: 8px; }
 .da-deadline { color: $color-text-tertiary; }
 
 .detail-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 0; color: $color-text-tertiary; }
