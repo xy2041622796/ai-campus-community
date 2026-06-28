@@ -28,4 +28,10 @@ async function handleToggle() {
 .btn-icon { font-size: 1rem; line-height: 1; }
 .btn-label { font-size: 0.85rem; color: #666; }
 .fav-btn.active .btn-label { color: #409eff; }
+@keyframes likePop {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.2); }
+  60% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
 </style>

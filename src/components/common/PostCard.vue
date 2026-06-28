@@ -243,11 +243,31 @@ function formatTime(dateStr) {
   cursor: pointer;
   color: $color-text-tertiary;
   font-size: $font-size-sm;
-  transition: $transition-fast;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+
   &:hover { background: $color-primary-subtle; color: $color-primary; }
-  &:active { transform: scale(0.92); }
-  &.like-btn.active { color: $color-heart; background: rgba(255, 71, 87, 0.06); }
-  &.fav-btn.active { color: #F5A623; background: rgba(245, 166, 35, 0.08); }
+  &:active { transform: scale(0.88); }
+
+  &.like-btn.active {
+    color: $color-heart;
+    background: rgba(255, 71, 87, 0.06);
+    animation: likePop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  &.fav-btn.active {
+    color: #F5A623;
+    background: rgba(245, 166, 35, 0.08);
+    animation: likePop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  svg { transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  &.active svg { transform: scale(1.15); }
+}
+
+@keyframes likePop {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.12); }
+  60% { transform: scale(0.95); }
+  100% { transform: scale(1); }
 }
 
 .action-label { font-weight: 500; }

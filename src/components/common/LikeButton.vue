@@ -36,7 +36,14 @@ function handleClick() { likeStore.toggleLike(props.postId) }
   transition: $transition-fast;
 
   &:hover { background: rgba(255, 71, 87, 0.06); color: $color-heart; }
-  &:active { transform: scale(0.92); }
+  &:active { transform: scale(0.85); }
+  &.active { animation: likePop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
   &.active { color: $color-heart; background: rgba(255, 71, 87, 0.06); }
+}
+@keyframes likePop {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.2); }
+  60% { transform: scale(0.95); }
+  100% { transform: scale(1); }
 }
 </style>
