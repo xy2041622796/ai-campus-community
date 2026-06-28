@@ -5,7 +5,7 @@
       <p class="page-desc">让你的校园形象更生动</p>
     </div>
 
-    <div class="edit-card">
+    <div class="form-card">
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
         <el-form-item label="头像">
           <ImageUploader v-model="form.avatar_url" bucket="avatars" />

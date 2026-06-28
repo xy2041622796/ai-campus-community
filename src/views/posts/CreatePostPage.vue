@@ -5,7 +5,7 @@
       <p class="create-desc">分享校园生活的点滴</p>
     </div>
 
-    <div class="create-card">
+    <div class="form-card">
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
         <el-form-item label="标题" prop="title">
           <el-input v-model="form.title" placeholder="给你的帖子起个标题..." size="large" maxlength="30" show-word-limit />

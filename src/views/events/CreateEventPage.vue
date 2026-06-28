@@ -7,7 +7,7 @@
       </button>
       <h1 class="ce-title">创建活动</h1>
     </div>
-    <div class="ce-card">
+    <div class="form-card">
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
         <el-form-item label="活动标题" prop="title">
           <el-input v-model="form.title" placeholder="给你的活动取个名字" maxlength="50" show-word-limit />

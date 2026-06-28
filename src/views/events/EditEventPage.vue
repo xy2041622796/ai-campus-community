@@ -8,7 +8,7 @@
       <h1 class="ce-title">编辑活动</h1>
     </div>
     <div v-if="loading" class="ce-loading"><div class="ce-spinner"></div></div>
-    <div v-else class="ce-card">
+    <div v-else class="form-card">
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
         <el-form-item label="活动动标标" prop="title">
           <el-input v-model="form.title" placeholder="给你的活动叫个什么" maxlength="50" show-word-limit />
