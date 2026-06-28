@@ -180,9 +180,7 @@ function handleCommand(cmd) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 20px;
   height: $navbar-height;
   gap: 20px;
 }
