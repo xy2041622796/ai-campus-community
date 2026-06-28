@@ -51,7 +51,8 @@ Phase 2 完成 — SCSS 编译错误已修复
 
 ### Phase 6：AI 活动策划推荐
 - [ ] 活动发布报名（events / participants 表）
-- [ ] AI 策划助手 + 个性化推荐
+- [x] AI 策划助手（创建活动页“AI 策划助手”按钮）
+- [ ] 个性化推荐
 状态：in_progress
 
 ## 关键问题

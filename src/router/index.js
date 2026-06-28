@@ -15,6 +15,7 @@ const routes = [
   { path: '/notifications', name: 'Notifications', component: () => import('@/views/notifications/NotificationsPage.vue'), meta: { layout: 'default', requiresAuth: true } },
   { path: '/discover', name: 'Discover', component: () => import('@/views/discover/DiscoverPage.vue'), meta: { layout: 'default', requiresAuth: true } },
   { path: '/people', name: 'People', component: () => import('@/views/discover/PeoplePage.vue'), meta: { layout: 'default', requiresAuth: true } },
+  { path: '/buddies', name: 'Buddies', component: () => import('@/views/buddies/BuddiesPage.vue'), meta: { layout: 'default', requiresAuth: true } },
   { path: '/search', name: 'Search', component: () => import('@/views/search/SearchPage.vue'), meta: { layout: 'default', requiresAuth: true } },
   { path: '/activities', name: 'Activities', component: () => import('@/views/activities/ActivitiesPage.vue'), meta: { layout: 'default', requiresAuth: true } },
   { path: '/events', name: 'Events', component: () => import('@/views/events/EventsPage.vue'), meta: { layout: 'default', requiresAuth: true } },

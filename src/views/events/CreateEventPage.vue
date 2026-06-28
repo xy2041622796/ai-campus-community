@@ -12,6 +12,7 @@
         <el-form-item label="活动标题" prop="title">
           <el-input v-model="form.title" placeholder="给你的活动取个名字" maxlength="50" show-word-limit />
         </el-form-item>
+        <div class="ai-suggest-bar"><el-button size="small" :loading="aiStore.polishing" :disabled="!form.title.trim()" @click="handleAISuggest"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> AI 策划助手</el-button></div>
         <el-form-item label="活动描述" prop="description">
           <el-input v-model="form.description" type="textarea" :rows="4" placeholder="描述一下你的活动" maxlength="500" show-word-limit />
         </el-form-item>
@@ -61,11 +62,13 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useEventStore } from '@/stores/event'
+import { useAIStore } from '@/stores/ai'
 
 const router = useRouter()
 const store = useEventStore()
 const formRef = ref(null)
 const submitting = ref(false)
+const aiStore = useAIStore()
 
 const form = reactive({
   title: '', description: '', event_date: null, location: '',
@@ -76,6 +79,13 @@ const rules = {
   title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
   description: [{ required: true, message: '请输入活动描述', trigger: 'blur' }],
   event_date: [{ required: true, message: '请选择活动时间', trigger: 'change' }],
+}
+
+async function handleAISuggest() {
+  if (!form.title.trim()) return
+  const prompt = '我想组织一个活动叫「' + form.title + '」，请帮我写一段活动描述，包括活动内容、逻辑和意义，100字左右'
+  const result = await aiStore.polishContent(prompt)
+  if (result) form.description = result
 }
 
 async function handleSubmit() {
@@ -108,5 +118,6 @@ async function handleSubmit() {
 .back-btn svg { stroke: currentColor; }
 .ce-title { font-family: $font-display; font-size: $font-size-xl; font-weight: 700; color: $color-text-primary; margin: 0; }
 .ce-card { background: $color-card; border: 1px solid $color-border-light; border-radius: $radius-xl; padding: 28px; }
+.ai-suggest-bar { margin-bottom: 8px; }
 .ce-actions { display: flex; justify-content: flex-end; gap: 12px; }
 </style>
