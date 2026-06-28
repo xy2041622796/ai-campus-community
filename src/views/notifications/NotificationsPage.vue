@@ -119,7 +119,7 @@ function handleClick(item) {
   cursor: pointer;
   transition: $transition-fast;
 
-  &:hover { ; border-; }
+  &:hover { border-color: $color-primary; }
 }
 
 .notif-loading {
