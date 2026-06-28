@@ -67,6 +67,7 @@
     </template>
   </el-dialog>
 </template>
+<script setup>
 import { ref, reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
