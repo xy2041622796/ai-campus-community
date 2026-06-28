@@ -1,4 +1,5 @@
 <template>
+  <div class="create-page-wrap">
   <div class="create-page">
     <div class="create-header">
       <h1 class="create-title">发布新帖子</h1>
@@ -64,6 +65,7 @@
       <el-button type="primary" @click="handleAcceptPolish">同意替换</el-button>
     </div>
   </el-dialog>
+  </div>
 </template>
 <script setup>
 import { ref, reactive, computed } from 'vue'
