@@ -39,6 +39,7 @@
             clearable
             popper-class="search-popper"
             @select="handleSelect"
+            @keyup.enter="handleSearchEnter"
           />
         </div>
 
@@ -141,6 +142,12 @@ async function querySearch(q, cb) {
   if (!q.trim()) { cb([]); return }
   const r = await profileStore.searchUsers(q.trim())
   cb(r || [])
+}
+
+function handleSearchEnter() {
+  if (searchQuery.value.trim()) {
+    router.push('/search?q=' + encodeURIComponent(searchQuery.value.trim()))
+  }
 }
 
 function handleSelect(item) {
