@@ -1,5 +1,6 @@
 ﻿<template>
-  <div class="detail-page" v-if="post">
+  <div class="post-detail-root">
+    <div class="detail-page" v-if="post">
     <!-- 返回按钮 -->
     <button class="back-btn" @click="router.back()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
@@ -65,9 +66,11 @@
     </section>
   </div>
 
-  <div v-else class="detail-loading">
+    </div>
+    <div v-else class="detail-loading">
     <div class="dl-spinner"></div>
     <p>加载中...</p>
+  </div>
   </div>
   <ImagePreview :src="previewSrc" :visible="previewVisible" :images="post?.images" v-model:current-index="previewIndex" @close="previewVisible = false" />
 </template>
@@ -209,7 +212,6 @@ function formatTime(dateStr) {
   margin-top: 20px; background: $color-card; border: $color-border;
   border-radius: $radius-xl; padding: 24px 32px; display: flex; flex-direction: column; gap: 16px;
 }
-.comment-heading { display: flex; align-items: center; gap: 8px; font-size: $font-size-lg; font-weight: 600; color: $color-text-primary; margin: 0; }
 .comment-heading { display: flex; align-items: center; gap: 8px; font-size: $font-size-lg; font-weight: 600; color: $color-text-primary; margin: 0; }
 .comment-heading svg { color: $color-primary; }
 .comment-count { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 6px; font-size: $font-size-xs; font-weight: 600; color: white; background: $color-primary-gradient; border-radius: $radius-round; }
