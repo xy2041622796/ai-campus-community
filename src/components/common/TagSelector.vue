@@ -6,7 +6,7 @@
     <div class="tag-input-row">
       <el-input v-model="inputVal" placeholder="输入标签并按回车添加" size="small" class="tag-input" @keyup.enter="addTag" />
       <div class="tag-suggestions">
-        <button v-for="s in suggestions" :key="s" class="tag-suggestion" :class="{ used: modelValue.includes(s) }"
+        <button v-for="s in suggestions" :key="s" type="button" class="tag-suggestion" :class="{ used: modelValue.includes(s) }"
           :disabled="modelValue.includes(s)" @click="selectSuggestion(s)">
           {{ s }}
         </button>
