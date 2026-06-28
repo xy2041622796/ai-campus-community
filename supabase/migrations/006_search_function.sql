@@ -1,27 +1,42 @@
--- pgvector search function
-CREATE OR REPLACE FUNCTION search_posts(
-  query_embedding vector(1536),
-  match_threshold float DEFAULT 0.7,
-  match_count int DEFAULT 20
+-- 006_search_function.sql
+-- 使用 PostgreSQL 内置全文搜索，无需外部 embedding API
+
+-- 创建全文搜索索引
+CREATE INDEX IF NOT EXISTS idx_posts_search ON posts USING GIN(
+  to_tsvector('simple', coalesce(title, '') || ' ' || coalesce(content, ''))
+);
+
+-- 搜索函数
+CREATE OR REPLACE FUNCTION search_posts_text(
+  search_query TEXT,
+  match_count INT DEFAULT 20
 )
-RETURNS TABLE(
+RETURNS TABLE (
   id UUID,
-  post_id UUID,
-  similarity float,
-  summary TEXT
+  title TEXT,
+  content TEXT,
+  author_id UUID,
+  images TEXT[],
+  tags TEXT[],
+  created_at TIMESTAMPTZ,
+  rank REAL
 )
 LANGUAGE plpgsql
 AS $$
 BEGIN
   RETURN QUERY
   SELECT
-    pe.id,
-    pe.post_id,
-    1 - (pe.embedding <=> query_embedding) AS similarity,
-    pe.summary
-  FROM post_embeddings pe
-  WHERE 1 - (pe.embedding <=> query_embedding) > match_threshold
-  ORDER BY pe.embedding <=> query_embedding
+    p.id,
+    p.title,
+    p.content,
+    p.author_id,
+    p.images,
+    p.tags,
+    p.created_at,
+    ts_rank(to_tsvector('simple', coalesce(p.title, '') || ' ' || coalesce(p.content, '')), plainto_tsquery('simple', search_query))::REAL AS rank
+  FROM posts p
+  WHERE to_tsvector('simple', coalesce(p.title, '') || ' ' || coalesce(p.content, '')) @@ plainto_tsquery('simple', search_query)
+  ORDER BY rank DESC
   LIMIT match_count;
 END;
 $$;

@@ -6,7 +6,7 @@ CREATE EXTENSION IF NOT EXISTS vector;
 CREATE TABLE IF NOT EXISTS post_embeddings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   post_id UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE UNIQUE,
-  embedding vector(1536),
+  embedding vector(384),
   summary TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS post_embeddings (
 CREATE TABLE IF NOT EXISTS user_embeddings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE UNIQUE,
-  embedding vector(1536),
+  embedding vector(384),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
