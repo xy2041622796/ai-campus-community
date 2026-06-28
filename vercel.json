@@ -1,1 +1,9 @@
-﻿{"rewrites":[{"source":"/api/:path*","destination":"/api/:path*"}]}
+﻿{
+  "$schema": "https://vercel.com/schemas/project-configuration.json",
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
+    }
+  ]
+}

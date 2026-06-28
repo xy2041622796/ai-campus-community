@@ -16,6 +16,10 @@ const routes = [
   { path: '/discover', name: 'Discover', component: () => import('@/views/discover/DiscoverPage.vue'), meta: { layout: 'default', requiresAuth: true } },
   { path: '/people', name: 'People', component: () => import('@/views/discover/PeoplePage.vue'), meta: { layout: 'default', requiresAuth: true } },
   { path: '/activities', name: 'Activities', component: () => import('@/views/activities/ActivitiesPage.vue'), meta: { layout: 'default', requiresAuth: true } },
+  { path: '/events', name: 'Events', component: () => import('@/views/events/EventsPage.vue'), meta: { layout: 'default', requiresAuth: true } },
+  { path: '/events/new', name: 'CreateEvent', component: () => import('@/views/events/CreateEventPage.vue'), meta: { layout: 'default', requiresAuth: true } },
+  { path: '/events/:id', name: 'EventDetail', component: () => import('@/views/events/EventDetailPage.vue'), meta: { layout: 'default', requiresAuth: true } },
+
   { path: '/messages', redirect: '/notifications' },
 ]
 
