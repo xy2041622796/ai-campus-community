@@ -36,7 +36,6 @@ import BottomNav from './BottomNav.vue'
   width: 100%;
   flex: 1;
   position: relative;
-  padding-left: $sidebar-width;
 }
 
 .app-content {
@@ -62,7 +61,6 @@ import BottomNav from './BottomNav.vue'
 .page-fade-leave-to { opacity: 0; transform: translateY(-4px); }
 
 @media (max-width: 1024px) {
-  .app-body { padding-left: 0; }
   .app-content { margin-left: 0; padding: 20px 20px; }
   .content-inner { max-width: 100%; }
 }
