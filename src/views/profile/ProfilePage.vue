@@ -160,11 +160,28 @@ watch(() => route.params.id, loadProfile)
   position: relative;
   background: linear-gradient(135deg, #4A6CF7 0%, #5EC4AC 50%, #3B82F6 100%);
   border-radius: $radius-xl;
-  padding: 36px 28px;
+  padding: 36px 28px 20px;
   color: white;
   overflow: hidden;
   margin-bottom: 20px;
 }
+
+.profile-stats-inline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 16px;
+  padding: 12px 20px;
+  background: rgba(255,255,255,0.12);
+  border-radius: $radius-md;
+  backdrop-filter: blur(8px);
+}
+
+.psi-item { text-align: center; cursor: pointer; padding: 0 4px; }
+.psi-num { display: block; font-size: $font-size-xl; font-weight: 700; color: white; }
+.psi-label { font-size: $font-size-xs; color: rgba(255,255,255,0.7); margin-top: 2px; }
+.psi-divider { width: 1px; height: 28px; background: rgba(255,255,255,0.2); }
 
 .cover-bg-pattern {
   position: absolute;
