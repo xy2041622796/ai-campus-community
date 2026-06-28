@@ -15,6 +15,18 @@ const envVars = fs.readFileSync(path.resolve(process.cwd(), '.env'), 'utf-8')
 const agnesKey = envVars.VITE_AGNES_KEY || envVars.AGNES_API_KEY
 
 export default defineConfig({
+  build: {
+    chunkSizeWarningLimit: 500,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor': ['vue', 'vue-router', 'pinia'],
+          'element': ['element-plus', '@element-plus/icons-vue'],
+          'supabase': ['@supabase/supabase-js']
+        }
+      }
+    }
+  },
   plugins: [
     vue(),
     AutoImport({
