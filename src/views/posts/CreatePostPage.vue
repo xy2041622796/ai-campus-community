@@ -58,13 +58,11 @@
         <div class="pc-content polished">{{ polishResult }}</div>
       </div>
     </div>
-    <template #footer>
-      <div class="dialog-footer">
-        <el-button @click="polishResult = null; showPolishDialog = false">取消</el-button>
-        <el-button @click="handleRePolish" :loading="polishLoading">重新润色</el-button>
-        <el-button type="primary" @click="handleAcceptPolish">同意替换</el-button>
-      </div>
-    </template>
+    <div class="dialog-footer" style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">
+      <el-button @click="polishResult = null; showPolishDialog = false">取消</el-button>
+      <el-button @click="handleRePolish" :loading="polishLoading">重新润色</el-button>
+      <el-button type="primary" @click="handleAcceptPolish">同意替换</el-button>
+    </div>
   </el-dialog>
 </template>
 <script setup>
