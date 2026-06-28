@@ -10,14 +10,13 @@ export const useAIStore = defineStore('ai', () => {
   async function polishContent(text) {
     polishing.value = true
     try {
-      const apiKey = import.meta.env.VITE_AGNES_KEY
       const res = await fetch('/agnes/v1/chat/completions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: 'agnes-2.0-flash',
           messages: [
-            { role: 'user', content: '直接返回润色后的文字，只返回一个版本，不要解释，不要夗选项，不要询问问题。保持原意和风格，只优化表达。文字如下：\n' + text }
+            { role: 'user', content: '你是一个校园社区助手。请润色以下帖子内容，使其更通顺、更吸引人。保持原意和风格，只优化表达，不改变事实。直接返回润色后的结果，不要加任何解释。\n\n' + text }
           ]
         })
       })
@@ -30,11 +29,7 @@ export const useAIStore = defineStore('ai', () => {
       return data.choices?.[0]?.message?.content || text
     } catch (e) {
       console.error('[AI] error:', e)
-      if (e.name === 'TypeError' && e.message.includes('fetch')) {
-        ElMessage.error('网络连接失败，请检查网络或梯子是否正常')
-      } else {
-        ElMessage.error(e.message || '服务失败')
-      }
+      ElMessage.error(e.message || '服务失败')
       return text
     } finally {
       polishing.value = false
@@ -44,18 +39,14 @@ export const useAIStore = defineStore('ai', () => {
   async function suggestTags(text) {
     suggesting.value = true
     try {
-      const apiKey = import.meta.env.VITE_AGNES_KEY
       const res = await fetch('/agnes/v1/chat/completions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: 'agnes-2.0-flash',
           messages: [
-            { role: 'system', content: '根据用户的帖子内容，推荐3-5个最相关的标签。只返回JSON数组格式，例如：[“标签1”,“标签2”,“标签3”]。不要加任何解释。' },
-            { role: 'user', content: text }
-          ],
-          max_tokens: 200,
-          temperature: 0.3
+            { role: 'user', content: '根据用户的帖子内容，推荐3-5个最相关的标签。只返回JSON数组格式，例如：[\“标签1\”,\“标签2\”,\“标签3\”]。不要加任何解释。\n\n' + text }
+          ]
         })
       })
       if (!res.ok) throw new Error('标签服务失败')
