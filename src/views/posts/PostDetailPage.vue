@@ -64,8 +64,6 @@
       <CommentForm :post-id="post.id" :reply-to="replyTo?.author?.nickname" :parent-id="replyTo?.id" @created="onCommentCreated" @cancel-reply="cancelReply" />
       <CommentList :post-id="post.id" @reply="handleReply" />
     </section>
-  </div>
-
     </div>
     <div v-else class="detail-loading">
     <div class="dl-spinner"></div>
