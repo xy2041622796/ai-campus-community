@@ -20,5 +20,13 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
-  server: { port: 5173 }
+  server: {
+    port: 5173,
+    proxy: {
+      '/api': {
+        target: process.env.VITE_VERCEL_URL || 'https://ai-campus-community-qu8lzkjjp-xy123.vercel.app',
+        changeOrigin: true
+      }
+    }
+  }
 })
