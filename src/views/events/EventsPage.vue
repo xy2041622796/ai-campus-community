@@ -6,9 +6,9 @@
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
           </svg>
-          活动活活
+          校园活动
         </h1>
-        <p class="events-desc">枚观校圖活动活活，一起参加</p>
+        <p class="events-desc">枚观校圖校园活动，一起参加</p>
       </div>
       <button class="events-create-btn" @click="router.push('/events/new')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -54,8 +54,8 @@
       <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
       </svg>
-      <h3>暂有活动活动</h3>
-      <p>先是第个活动吧吗吧吗吧吗</p>
+      <h3>暂无活动</h3>
+      <p>发布第一个活动吧</p>
     </div>
   </div>
 </template>
