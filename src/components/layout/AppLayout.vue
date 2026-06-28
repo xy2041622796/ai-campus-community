@@ -44,14 +44,14 @@ import BottomNav from './BottomNav.vue'
   flex: 1;
   height: calc(100vh - $navbar-height);
   overflow-y: auto;
-  display: flex;
-  justify-content: center;
-  padding: 28px 32px;
+  padding: 28px 0;
 }
 
 .content-inner {
   width: 100%;
   max-width: $content-max;
+  margin: 0 auto;
+  padding: 0 24px;
 }
 
 /* Page transition */
@@ -63,11 +63,12 @@ import BottomNav from './BottomNav.vue'
 .page-fade-leave-to { opacity: 0; transform: translateY(-4px); }
 
 @media (max-width: 1024px) {
-  .app-content { margin-left: 0; padding: 20px; }
-  .content-inner { max-width: 100%; }
+  .app-content { margin-left: 0; padding: 20px 0; }
+  .content-inner { max-width: 100%; padding: 0 16px; }
 }
 
 @media (max-width: 768px) {
-  .app-content { padding: 12px; padding-bottom: calc(64px + 16px); }
+  .app-content { padding: 12px 0; padding-bottom: calc(64px + 16px); }
+  .content-inner { padding: 0 12px; }
 }
 </style>
