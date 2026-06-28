@@ -94,9 +94,24 @@ const rules = {
 
 async function handlePolish() {
   if (!form.content.trim()) { ElMessage.info('请先填写正文内容'); return }
-  if (!form.content.trim()) return
   const result = await aiStore.polishContent(form.content)
-  if (result) form.content = result
+  if (result && result !== form.content) {
+    polishOriginal.value = form.content
+    polishResult.value = result
+    showPolishDialog.value = true
+  }
+}
+
+function handleAcceptPolish() {
+  if (polishResult.value) form.content = polishResult.value
+  showPolishDialog.value = false
+  polishResult.value = null
+}
+
+function handleRePolish() {
+  showPolishDialog.value = false
+  polishResult.value = null
+  handlePolish()
 }
 
 async function handleSubmit() {
