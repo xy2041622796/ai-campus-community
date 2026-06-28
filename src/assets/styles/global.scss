@@ -89,3 +89,42 @@ a:hover { color: color.adjust($color-primary, $lightness: -8%); }
 }
 .el-input__wrapper:hover { box-shadow: 0 0 0 1px $color-border-hover inset !important; }
 .el-input__wrapper.is-focus { box-shadow: 0 0 0 1.5px $color-primary inset !important; }
+
+
+/* ===== Form Layout Improvements ===== */
+.el-form {
+  .el-form-item {
+    margin-bottom: 22px;
+  }
+
+  .el-form-item__label {
+    font-weight: 600;
+    color: $color-text-primary;
+    padding-bottom: 6px;
+    line-height: 1.4;
+  }
+
+  .el-form-item.is-required .el-form-item__label::before {
+    color: $color-heart;
+    margin-right: 2px;
+  }
+
+  .el-input__wrapper,
+  .el-select__wrapper,
+  .el-textarea__inner {
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+}
+
+/* Form card layout (shared by all form pages) */
+.form-card {
+  background: $color-card;
+  border: 1px solid $color-border-light;
+  border-radius: $radius-xl;
+  padding: 32px;
+}
+
+@media (max-width: 768px) {
+  .el-form .el-form-item { margin-bottom: 18px; }
+  .form-card { padding: 20px; border-radius: $radius-md; }
+}
