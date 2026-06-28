@@ -17,11 +17,8 @@ export const useAIStore = defineStore('ai', () => {
         body: JSON.stringify({
           model: 'agnes-2.0-flash',
           messages: [
-            { role: 'system', content: '你是一个校园社区助手。润色用户的帖子内容，使其更通顺、更吸引人。保持原意和风格，只优化表达，不改变事实。直接返回润色后的文本，不要加任何解释。' },
-            { role: 'user', content: text }
-          ],
-          max_tokens: 1000,
-          temperature: 0.7
+            { role: 'user', content: '请帮我润色以下文字，使其更通顺更吸引人，保持原意和风格：\n\n' + text }
+          ]
         })
       })
       if (!res.ok) {
