@@ -158,7 +158,7 @@ function handleClick(item) {
   transition: $transition-fast;
   position: relative;
 
-  &:hover { $shadow-hover; }
+  &:hover { box-shadow: $shadow-hover; }
   & + & { border-top: $color-border-light; }
 
   &.unread { background: rgba(74, 108, 247, 0.03); }
