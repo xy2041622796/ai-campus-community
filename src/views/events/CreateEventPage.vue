@@ -46,6 +46,9 @@
             </el-form-item>
           </el-col>
         </el-row>
+        <el-form-item label="图片">
+          <ImageUploader :images="form.images" @update:images="form.images = $event" />
+        </el-form-item>
         <el-form-item>
           <div class="ce-actions">
             <el-button @click="router.back()">取消</el-button>
@@ -63,6 +66,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useEventStore } from '@/stores/event'
 import { useAIStore } from '@/stores/ai'
+import ImageUploader from '@/components/common/ImageUploader.vue'
 
 const router = useRouter()
 const store = useEventStore()
