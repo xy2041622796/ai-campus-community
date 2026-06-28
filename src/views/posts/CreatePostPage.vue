@@ -20,7 +20,7 @@
         </el-form-item>
 
         <el-form-item label="标签">
-          <TagSelector :tags="form.tags" @update:tags="form.tags = $event" />
+          <TagSelector :tags="form.tags" @update:modelValue="form.tags = $event" />
         </el-form-item>
 
         <el-form-item>
