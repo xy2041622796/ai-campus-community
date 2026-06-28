@@ -25,10 +25,11 @@ import BottomNav from './BottomNav.vue'
 @use '@/assets/styles/variables' as *;
 
 .app-layout {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   background: $color-surface;
+  overflow: hidden;
 }
 
 .app-body {
@@ -41,7 +42,8 @@ import BottomNav from './BottomNav.vue'
 .app-content {
   margin-left: $sidebar-width;
   flex: 1;
-  min-height: calc(100vh - $navbar-height);
+  height: calc(100vh - $navbar-height);
+  overflow-y: auto;
   display: flex;
   justify-content: center;
   padding: 28px 32px;
