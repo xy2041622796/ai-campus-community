@@ -43,7 +43,7 @@
             <svg width="20" height="20" viewBox="0 0 24 24" :fill="likeStore.isLiked(post.id) ? '#FF4757' : 'none'" :stroke="likeStore.isLiked(post.id) ? '#FF4757' : 'currentColor'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             <span>{{ likeCount > 0 ? likeCount : '点赞' }}</span>
           </button>
-          <button class="dact" :class="{ active: favoriteStore.isFavorited(post.id) }" @click="handleFavorite">
+          <button class="dact" :class="{ active: favoriteStore.isFavorited(post.id) }" :disabled="favoriteStore.toggling" @click="handleFavorite">
             <svg width="20" height="20" viewBox="0 0 24 24" :fill="favoriteStore.isFavorited(post.id) ? '#F5A623' : 'none'" :stroke="favoriteStore.isFavorited(post.id) ? '#F5A623' : 'currentColor'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
             <span>{{ favoriteStore.isFavorited(post.id) ? '已收藏' : '收藏' }}</span>
           </button>
@@ -61,7 +61,7 @@
         <span>回复复 @{{ replyTo.author?.nickname }}</span>
         <button @click="cancelReply">取消回复</button>
       </div>
-      <CommentForm :post-id="post.id" :reply-to="replyTo?.author?.nickname" :parent-id="replyTo?.id" @created="onCommentCreated" @cancel-reply="cancelReply" />
+      <CommentForm :key="replyTo ? replyTo.id : 'default'" :post-id="post.id" :reply-to="replyTo?.author?.nickname" :parent-id="replyTo?.id" @created="onCommentCreated" @cancel-reply="cancelReply" />
       <CommentList :post-id="post.id" @reply="handleReply" />
     </section>
     </div>
@@ -69,8 +69,8 @@
     <div class="dl-spinner"></div>
     <p>加载中...</p>
   </div>
-  </div>
   <ImagePreview :src="previewSrc" :visible="previewVisible" :images="post?.images" v-model:current-index="previewIndex" @close="previewVisible = false" />
+  </div>
 </template>
 
 <script setup>
@@ -113,12 +113,10 @@ onMounted(async () => {
   }
 })
 
-function handleLike() {
+async function handleLike() {
   if (!post.value) return
-  const before = likeStore.isLiked(post.value.id)
-  likeStore.toggleLike(post.value.id)
-  if (!before) likeStore.likeCounts[post.value.id] = (likeStore.likeCounts[post.value.id] || 0) + 1
-  else likeStore.likeCounts[post.value.id] = Math.max(0, (likeStore.likeCounts[post.value.id] || 1) - 1)
+  await likeStore.toggleLike(post.value.id)
+  await likeStore.fetchLikeCount(post.value.id)
 }
 
 function handleFavorite() { if (post.value) favoriteStore.toggleFavorite(post.value.id) }
@@ -188,8 +186,8 @@ function formatTime(dateStr) {
 .detail-title { font-family: $font-display; font-size: 1.35rem; font-weight: 700; color: $color-text-primary; line-height: 1.3; margin-bottom: 16px; }
 .detail-content { font-size: 1rem; color: $color-text-secondary; line-height: $line-height-relaxed; white-space: pre-wrap; }
 .detail-images { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
-.detail-image-cell { border-radius: $radius-md; overflow: hidden; background: $color-surface; }
-.detail-image-cell img { width: 100%; max-height: 500px; object-fit: contain; display: block; }
+.detail-image-cell { width: 100%; max-height: 500px; }
+.detail-image-cell img { width: 100%; max-height: 500px; object-fit: cover; display: block; border-radius: $radius-md; }
 .detail-footer { padding-top: 20px; border-top: $color-border-light; }
 .detail-actions { display: flex; gap: 8px; }
 .dact {
@@ -229,3 +227,12 @@ function formatTime(dateStr) {
   .detail-card, .comment-section { padding: 20px; border-radius: $radius-md; }
 }
 </style>
+
+
+
+
+
+
+
+
+

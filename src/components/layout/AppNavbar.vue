@@ -76,7 +76,7 @@
               <polyline points="6 9 12 15 18 9"/>
             </svg>
           </button>
-          <template #$z-dropdown>
+          <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item command="profile">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;vertical-align:middle"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -385,6 +385,7 @@ function handleCommand(cmd) {
   .btn-user { padding: 4px; }
 }
 </style>
+
 
 
 

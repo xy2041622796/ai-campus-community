@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="create-event-page">
     <div class="ce-header">
       <button class="back-btn" @click="router.back()">
@@ -12,7 +12,8 @@
         <el-form-item label="活动标题" prop="title">
           <el-input v-model="form.title" placeholder="给你的活动取个名字" maxlength="50" show-word-limit />
         </el-form-item>
-        <div class="ai-suggest-bar"><el-button size="small" :loading="aiStore.polishing" :disabled="!form.title.trim()" @click="handleAISuggest"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> AI 策划助手</el-button></div>
+        <div class="ai-suggest-bar"><el-button size="small" :loading="aiStore.polishing" :disabled="!form.title.trim()" @click="handleAISuggest"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> AI 策划活动</el-button>
+          <el-button size="small" :loading="planLoading" :disabled="!form.title.trim()" @click="handleAIPlan"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg> AI 完整方案</el-button></div>
         <el-form-item label="活动描述" prop="description">
           <el-input v-model="form.description" type="textarea" :rows="4" placeholder="描述一下你的活动" maxlength="500" show-word-limit />
         </el-form-item>
@@ -49,6 +50,12 @@
         <el-form-item label="图片">
           <ImageUploader :images="form.images" @update:images="form.images = $event" />
         </el-form-item>
+        <el-form-item v-if="planResult">
+          <div class="ai-plan-card">
+            <div class="ai-plan-header"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> AI 策划方案</div>
+            <div class="ai-plan-content">{{ planResult }}</div>
+          </div>
+        </el-form-item>
         <el-form-item>
           <div class="ce-actions">
             <el-button @click="router.back()">取消</el-button>
@@ -73,6 +80,8 @@ const store = useEventStore()
 const formRef = ref(null)
 const submitting = ref(false)
 const aiStore = useAIStore()
+const planResult = ref(null)
+const planLoading = ref(false)
 
 const form = reactive({
   title: '', description: '', event_date: null, location: '',
@@ -92,6 +101,15 @@ async function handleAISuggest() {
   if (result) form.description = result
 }
 
+async function handleAIPlan() {
+  if (!form.title.trim()) { ElMessage.info('请先填写活动标题'); return }
+  planLoading.value = true
+  const details = '时间：' + (form.event_date ? new Date(form.event_date).toLocaleDateString('zh-CN') : '待定') + '，地点：' + (form.location || '待定') + '，人数：' + (form.max_participants || '不限')
+  const result = await aiStore.planEvent(form.title, details)
+  if (result) planResult.value = result
+  planLoading.value = false
+}
+
 async function handleSubmit() {
   const valid = await formRef.value?.validate().catch(() => false)
   if (!valid) return
@@ -103,6 +121,7 @@ async function handleSubmit() {
       max_participants: form.max_participants, deadline: form.deadline,
       images: form.images
     })
+    planResult.value = null
     ElMessage.success('活动创建成功!')
     router.push('/events')
   } catch (e) { ElMessage.error(e.message || '创建失败') }
@@ -122,6 +141,29 @@ async function handleSubmit() {
 .back-btn svg { stroke: currentColor; }
 .ce-title { font-family: $font-display; font-size: $font-size-xl; font-weight: 700; color: $color-text-primary; margin: 0; }
 .ce-card { background: $color-card; border: 1px solid $color-border-light; border-radius: $radius-xl; padding: 28px; }
-.ai-suggest-bar { margin-bottom: 8px; }
+.ai-suggest-bar { display: flex; gap: 8px; margin-bottom: 8px; }
+
+.ai-plan-card {
+  width: 100%;
+  background: linear-gradient(135deg, rgba(74, 108, 247, 0.04), rgba(94, 196, 172, 0.04));
+  border: 1px solid rgba(74, 108, 247, 0.12);
+  border-radius: $radius-lg;
+  overflow: hidden;
+}
+.ai-plan-header {
+  display: flex; align-items: center; gap: 6px;
+  padding: 10px 16px;
+  background: rgba(74, 108, 247, 0.06);
+  font-size: $font-size-sm; font-weight: 600; color: $color-primary;
+  svg { stroke: $color-primary; }
+}
+.ai-plan-content {
+  padding: 16px;
+  font-size: $font-size-sm;
+  line-height: $line-height-relaxed;
+  color: $color-text-secondary;
+  white-space: pre-wrap;
+}
 .ce-actions { display: flex; justify-content: flex-end; gap: 12px; }
 </style>
+

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="activities-page">
     <div class="activities-header">
       <h1 class="activities-title">
@@ -50,12 +50,16 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { supabase } from '@/api/supabase'
+import { useRouter } from 'vue-router'
 import { useNotificationStore } from '@/stores/notification'
 import { formatTime } from '@/utils/helpers'
 
 const router = useRouter()
 const notifStore = useNotificationStore()
 const loading = ref(true)
+const seasonSuggestions = ref([])
+const router = useRouter()
 const activities = ref([])
 
 function goToPost(item) {
@@ -74,6 +78,17 @@ onMounted(async () => {
 
 .activities-page { animation: pageFadeIn 0.4s ease; }
 @keyframes pageFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.season-section { margin-bottom: 24px; }
+.season-title { display: flex; align-items: center; gap: 8px; font-size: -size-base; font-weight: 600; color: -primary; margin: 0 0 12px; svg { stroke: -primary; } }
+.season-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.season-card { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: -card; border: 1px solid -border-light; border-radius: -lg; cursor: pointer; transition: all 0.15s ease; text-align: left; width: 100%; }
+.season-card:hover { border-color: -primary; background: -primary-subtle; transform: translateY(-1px); }
+.season-icon { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: rgba(74, 108, 247, 0.08); border-radius: -md; flex-shrink: 0; svg { stroke: -primary; } }
+.season-info { flex: 1; min-width: 0; }
+.season-name { font-weight: 600; font-size: -size-sm; color: -text-primary; }
+.season-desc { font-size: -size-xs; color: -text-tertiary; margin-top: 2px; }
+@media (max-width: 768px) { .season-grid { grid-template-columns: 1fr; } }
 
 .activities-header { margin-bottom: 24px; }
 .activities-title {
@@ -111,3 +126,4 @@ onMounted(async () => {
 
 .activities-empty { text-align: center; padding: 80px 20px; color: $color-text-tertiary; svg { stroke: $color-text-tertiary; } h3 { font-size: $font-size-lg; font-weight: 600; color: $color-text-primary; margin: 12px 0 4px; } p { font-size: $font-size-sm; margin: 0; } }
 </style>
+

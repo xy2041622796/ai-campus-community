@@ -1,9 +1,10 @@
-import { defineStore } from 'pinia'
+﻿import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { supabase } from '@/api/supabase'
 
 export const useLikeStore = defineStore('like', () => {
   const likedPosts = ref(new Set())
+  const toggling = ref(false)
   const likeCounts = ref({})
 
   async function fetchLikedPosts(userId) {
@@ -17,19 +18,24 @@ export const useLikeStore = defineStore('like', () => {
   }
 
   async function toggleLike(postId) {
-    const { data: { user } } = await supabase.auth.getSession()
-    if (!user) return
+    if (toggling.value) return
+    toggling.value = true
+    try {
+      const { data: { user } } = await supabase.auth.getSession()
+      if (!user) return
 
-    if (isLiked(postId)) {
-      await supabase.from('likes').delete()
-        .eq('post_id', postId).eq('user_id', user.id)
-      likedPosts.value.delete(postId)
-      if (likeCounts.value[postId]) likeCounts.value[postId]--
-    } else {
-      await supabase.from('likes').insert({ post_id: postId, user_id: user.id })
-      likedPosts.value.add(postId)
-      if (likeCounts.value[postId]) likeCounts.value[postId]++
-    }
+      if (isLiked(postId)) {
+        await supabase.from('likes').delete()
+          .eq('post_id', postId).eq('user_id', user.id)
+        likedPosts.value.delete(postId)
+        if (likeCounts.value[postId]) likeCounts.value[postId]--
+      } else {
+        await supabase.from('likes').insert({ post_id: postId, user_id: user.id })
+        likedPosts.value.add(postId)
+        if (likeCounts.value[postId]) likeCounts.value[postId]++
+      }
+    } catch (e) { console.error('[Like]', e) }
+    finally { toggling.value = false }
   }
 
   async function fetchLikeCount(postId) {
@@ -50,5 +56,9 @@ export const useLikeStore = defineStore('like', () => {
     Object.assign(likeCounts.value, counts)
   }
 
-  return { likedPosts, likeCounts, fetchLikedPosts, isLiked, toggleLike, fetchLikeCount, fetchLikeCounts }
+  return { likedPosts, toggling, likeCounts, fetchLikedPosts, isLiked, toggleLike, fetchLikeCount, fetchLikeCounts }
 })
+
+
+
+

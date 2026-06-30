@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="people-page">
     <div class="people-header">
       <h1 class="people-title">
@@ -7,7 +7,10 @@
         </svg>
         发现同学
       </h1>
-      <p class="people-desc">根据共兴品超的同学，可能关识一下</p>
+      <p class="people-desc">根据兴趣标签推荐的同学，AI 帮你发现共同点</p>
+      <div class="people-ai-bar">
+        <el-button size="small" :loading="reasonLoading" :disabled="!store.users.length" @click="generateReasons"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> AI 推荐理由</el-button>
+      </div>
     </div>
 
     <div v-if="store.loading" class="people-loading">
@@ -28,6 +31,10 @@
             <span v-if="u.grade"> · {{ u.grade }}</span>
           </div>
           <div v-if="u.bio" class="pc-bio">{{ u.bio.slice(0, 40) }}{{ u.bio.length > 40 ? '...' : '' }}</div>
+          <div v-if="aiReasons.get(u.id)" class="pc-ai-reason">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            {{ aiReasons.get(u.id) }}
+          </div>
           <div class="pc-tags">
             <span v-if="u.same_college" class="pc-tag badge-college">同校</span>
             <span v-if="u.common_tags > 0" class="pc-tag badge-interest">共兴匹超 · {{ u.common_tags }}</span>
@@ -51,10 +58,29 @@
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useRecommendStore } from '@/stores/recommend'
+import { useAIStore } from '@/stores/ai'
+import { useAuthStore } from '@/stores/auth'
 import FollowButton from '@/components/common/FollowButton.vue'
 
 const router = useRouter()
 const store = useRecommendStore()
+const aiStore = useAIStore()
+const authStore = useAuthStore()
+const aiReasons = ref(new Map())
+const reasonLoading = ref(false)
+
+async function generateReasons() {
+  if (!store.users.length || !authStore.user) return
+  reasonLoading.value = true
+  const newReasons = new Map()
+  const batch = store.users.slice(0, 5)
+  for (const u of batch) {
+    const reason = await aiStore.generateRecommendationReason(authStore.user, u)
+    if (reason) newReasons.set(u.id, reason)
+  }
+  aiReasons.value = newReasons
+  reasonLoading.value = false
+}
 
 onMounted(() => { store.fetchRecommendations() })
 </script>
@@ -104,5 +130,15 @@ onMounted(() => { store.fetchRecommendations() })
 
 .pc-follow { flex-shrink: 0; }
 
+.people-ai-bar { margin-bottom: 12px; }
+
+.pc-ai-reason {
+  display: flex; align-items: center; gap: 4px;
+  margin-top: 4px; font-size: 0.7rem; color: $color-primary;
+  background: rgba(74, 108, 247, 0.06); padding: 2px 8px; border-radius: $radius-round;
+  svg { stroke: $color-primary; flex-shrink: 0; }
+}
+
 .people-empty { text-align: center; padding: 80px 20px; color: $color-text-tertiary; svg { stroke: $color-text-tertiary; } h3 { font-size: $font-size-lg; font-weight: 600; color: $color-text-primary; margin: 12px 0 4px; } p { font-size: $font-size-sm; margin: 0; } }
 </style>
+

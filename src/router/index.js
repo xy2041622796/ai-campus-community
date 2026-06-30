@@ -17,6 +17,7 @@ const routes = [
   { path: '/people', name: 'People', component: () => import('@/views/discover/PeoplePage.vue'), meta: { layout: 'default', requiresAuth: true } },
   { path: '/buddies', name: 'Buddies', component: () => import('@/views/buddies/BuddiesPage.vue'), meta: { layout: 'default', requiresAuth: true } },
   { path: '/search', name: 'Search', component: () => import('@/views/search/SearchPage.vue'), meta: { layout: 'default', requiresAuth: true } },
+  { path: '/digest', name: 'DailyDigest', component: () => import('@/views/digest/DailyDigestPage.vue'), meta: { layout: 'default', requiresAuth: true } },
   { path: '/activities', name: 'Activities', component: () => import('@/views/activities/ActivitiesPage.vue'), meta: { layout: 'default', requiresAuth: true } },
   { path: '/events', name: 'Events', component: () => import('@/views/events/EventsPage.vue'), meta: { layout: 'default', requiresAuth: true } },
   { path: '/events/new', name: 'CreateEvent', component: () => import('@/views/events/CreateEventPage.vue'), meta: { layout: 'default', requiresAuth: true } },
@@ -26,7 +27,14 @@ const routes = [
   { path: '/messages', redirect: '/notifications' },
 ]
 
-const router = createRouter({ history: createWebHistory(), routes })
+const router = createRouter({ history: createWebHistory(), scrollBehavior(to, from, savedPosition) {
+  // If user navigated via browser back/forward, restore scroll position
+  if (savedPosition) return savedPosition
+  // If coming from a post detail page, scroll to top
+  if (from.path && from.path.startsWith('/posts/')) return { top: 0 }
+  // Default: scroll to top
+  return { top: 0 }
+}, routes })
 
 router.beforeEach(async (to, from, next) => {
   const { data: { session } } = await supabase.auth.getSession()
@@ -36,3 +44,4 @@ router.beforeEach(async (to, from, next) => {
 })
 
 export default router
+

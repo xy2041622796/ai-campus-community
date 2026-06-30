@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="create-page-wrap">
   <div class="create-page">
     <div class="create-header">
@@ -21,10 +21,12 @@
 
         <el-form-item label="图片">
           <ImageUploader :images="form.images" @update:images="form.images = $event" />
+          <div class="ai-cover-bar"><el-button size="small" :loading="coverLoading" :disabled="!form.title.trim()" @click="handleGenerateCover"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> AI 生成封面图</el-button></div>
         </el-form-item>
 
         <el-form-item label="标签">
           <TagSelector :tags="form.tags" @update:modelValue="form.tags = $event" />
+          <div class="ai-tag-bar"><el-button size="small" :loading="tagLoading" :disabled="!form.content.trim() && !form.title.trim()" @click="handleSuggestTags"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> AI 生成标签</el-button></div>
         </el-form-item>
 
         <el-form-item>
@@ -69,16 +71,20 @@ import { usePostStore } from '@/stores/post'
 import ImageUploader from '@/components/common/ImageUploader.vue'
 import TagSelector from '@/components/common/TagSelector.vue'
 import { useAIStore } from '@/stores/ai'
+import { analyzePost } from '@/api/coze'
 
 const router = useRouter()
 const postStore = usePostStore()
 const formRef = ref(null)
 const submitting = ref(false)
+const tagLoading = ref(false)
+const coverLoading = ref(false)
+const polishLoading = ref(false)
 const aiStore = useAIStore()
 const showPolishDialog = ref(false)
 const polishOriginal = ref('')
 const polishResult = ref('')
-const polishLoading = computed(() => aiStore.polishing)
+
 const charCount = computed(() => form.content.length)
 const form = reactive({ title: '', content: '', images: [], tags: [] })
 const rules = {
@@ -88,11 +94,16 @@ const rules = {
 
 async function handlePolish() {
   if (!form.content.trim()) { ElMessage.info('请先填写正文内容'); return }
-  const result = await aiStore.polishContent(form.content)
-  if (result && result !== form.content) {
-    polishOriginal.value = form.content
-    polishResult.value = result
-    showPolishDialog.value = true
+  polishLoading.value = true
+  try {
+    const result = await aiStore.polishContent(form.content)
+    if (result && result !== form.content) {
+      polishOriginal.value = form.content
+      polishResult.value = result
+      showPolishDialog.value = true
+    }
+  } finally {
+    polishLoading.value = false
   }
 }
 
@@ -108,12 +119,72 @@ function handleRePolish() {
   handlePolish()
 }
 
+
+async function handleSuggestTags() {
+  const text = (form.title + ' ' + form.content).trim()
+  if (!text) { ElMessage.info('请先填写标题或正文'); return }
+  tagLoading.value = true
+  try {
+    const result = await analyzePost(text)
+    if (!result) { ElMessage.warning('AI 分析暂不可用，请检查网络'); return }
+    const tags = result.topics || []
+    if (tags.length) {
+      form.tags = [...new Set([...form.tags, ...tags])]
+      ElMessage.success('已生成 ' + tags.length + ' 个标签')
+    } else {
+      ElMessage.info('AI 未能提取到标签，试试写详细一些')
+    }
+  } catch (e) {
+    console.error('[Tags] error:', e)
+    ElMessage.error('AI 服务异常，请稍后重试')
+  } finally {
+    tagLoading.value = false
+  }
+}
+
+async function handleGenerateCover() {
+  if (!form.title.trim()) { ElMessage.info('请先填写标题'); return }
+  coverLoading.value = true
+  try {
+    const text = (form.title + ' ' + form.content).trim()
+    const analysis = await analyzePost(text)
+    let prompt = analysis?.topics?.[0] || form.title
+    const url = await aiStore.generateCoverImage(prompt)
+    if (url) {
+      form.images = [...form.images, url]
+      ElMessage.success('封面图已生成')
+    }
+  } finally {
+    coverLoading.value = false
+  }
+}
+
+
 async function handleSubmit() {
   const valid = await formRef.value?.validate().catch(() => false)
   if (!valid) return
   submitting.value = true
   try {
-    await postStore.createPost({ title: form.title, content: form.content, images: form.images, tags: form.tags })
+    let intent, emotion, topics, summary
+    try {
+      const text = (form.title + ' ' + form.content).trim()
+      const structure = await analyzePost(text)
+      if (structure) {
+        intent = structure.intent
+        emotion = structure.emotion
+        topics = structure.topics
+        summary = structure.summary
+      }
+    } catch (e) {
+      console.error('[CreatePost] AI analysis skipped:', e)
+    }
+    await postStore.createPost({
+      title: form.title,
+      content: form.content,
+      images: form.images,
+      tags: form.tags,
+      intent, emotion, topics, summary
+    })
     ElMessage.success('发布成功！')
     router.push('/')
   } catch (e) { ElMessage.error(e.message || '发布失败') }

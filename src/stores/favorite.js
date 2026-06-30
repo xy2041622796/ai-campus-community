@@ -4,6 +4,7 @@ import { supabase } from '@/api/supabase'
 
 export const useFavoriteStore = defineStore('favorite', () => {
   const favoritedPosts = ref(new Set())
+  const toggling = ref(false)
   const favoriteList = ref([])
 
   async function fetchFavoritedPosts(userId) {
@@ -17,17 +18,22 @@ export const useFavoriteStore = defineStore('favorite', () => {
   }
 
   async function toggleFavorite(postId) {
-    const { data: { user } } = await supabase.auth.getSession()
-    if (!user) return
+    if (toggling.value) return
+    toggling.value = true
+    try {
+      const { data: { user } } = await supabase.auth.getSession()
+      if (!user) return
 
-    if (isFavorited(postId)) {
-      await supabase.from('favorites').delete()
-        .eq('post_id', postId).eq('user_id', user.id)
-      favoritedPosts.value.delete(postId)
-    } else {
-      await supabase.from('favorites').insert({ post_id: postId, user_id: user.id })
-      favoritedPosts.value.add(postId)
-    }
+      if (isFavorited(postId)) {
+        await supabase.from('favorites').delete()
+          .eq('post_id', postId).eq('user_id', user.id)
+        favoritedPosts.value.delete(postId)
+      } else {
+        await supabase.from('favorites').insert({ post_id: postId, user_id: user.id })
+        favoritedPosts.value.add(postId)
+      }
+    } catch (e) { console.error('[Favorite]', e) }
+    finally { toggling.value = false }
   }
 
   async function fetchFavoritePosts(userId) {
@@ -42,5 +48,5 @@ export const useFavoriteStore = defineStore('favorite', () => {
     favoriteList.value = posts || []
   }
 
-  return { favoritedPosts, favoriteList, fetchFavoritedPosts, isFavorited, toggleFavorite, fetchFavoritePosts }
+  return { favoritedPosts, toggling, favoriteList, fetchFavoritedPosts, isFavorited, toggleFavorite, fetchFavoritePosts }
 })

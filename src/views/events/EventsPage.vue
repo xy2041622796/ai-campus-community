@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="events-page">
     <div class="events-header">
       <div class="eh-left">
@@ -16,6 +16,26 @@
       </button>
     </div>
 
+    <div v-if="aiRecommended.length" class="events-section">
+      <h2 class="events-section-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        AI 为你推荐
+      </h2>
+      <div class="events-list">
+        <div v-for="ev in aiRecommended" :key="ev.id" class="event-card recommended" @click="router.push('/events/' + ev.id)">
+          <div v-if="ev.images?.length" class="ec-image"><img :src="ev.images[0]" alt="" loading="lazy" /></div>
+          <div class="ec-body">
+            <div class="ec-meta">
+              <span class="ec-date"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>{{ formatEventDate(ev.event_date) }}</span>
+              <span class="rec-badge">推荐</span>
+            </div>
+            <h3 class="ec-title">{{ ev.title }}</h3>
+            <p class="ec-desc">{{ ev.description.slice(0, 60) }}{{ ev.description.length > 60 ? '...' : '' }}</p>
+            <div class="ec-footer"><span class="ec-organizer"><img v-if="ev.organizer?.avatar_url" :src="ev.organizer.avatar_url" class="eo-avatar" /><span>{{ ev.organizer?.nickname || '未知用户' }}</span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div v-if="store.loading" class="events-loading">
       <div class="el-spinner"></div>
       <span>加载中...</span>
@@ -61,12 +81,17 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useEventStore } from '@/stores/event'
+import { useAIStore } from '@/stores/ai'
+import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
 const store = useEventStore()
+const aiStore = useAIStore()
+const authStore = useAuthStore()
+const aiRecommended = ref([])
 
 function formatEventDate(dateStr) {
   const d = new Date(dateStr)
@@ -78,7 +103,17 @@ function statusLabel(s) {
   return map[s] || s
 }
 
-onMounted(() => { store.fetchEvents(); store.fetchMyRegistrations() })
+onMounted(async () => {
+  await store.fetchEvents()
+  store.fetchMyRegistrations()
+  // AI 活动推荐
+  if (authStore.user?.interest_tags?.length && store.upcomingEvents.length) {
+    const recommendedTitles = await aiStore.recommendEvents(authStore.user.interest_tags, store.upcomingEvents)
+    if (recommendedTitles.length) {
+      aiRecommended.value = store.upcomingEvents.filter(e => recommendedTitles.includes(e.title))
+    }
+  }
+})
 </script>
 
 <style scoped lang="scss">
@@ -110,6 +145,12 @@ onMounted(() => { store.fetchEvents(); store.fetchMyRegistrations() })
   &:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(74, 108, 247, 0.3); }
   svg { stroke: currentColor; }
 }
+
+.events-section { margin-bottom: 24px; }
+.events-section-title { display: flex; align-items: center; gap: 8px; font-size: $font-size-base; font-weight: 600; color: $color-primary; margin: 0 0 12px; svg { stroke: $color-primary; } }
+
+.event-card.recommended { border-color: rgba(74, 108, 247, 0.2); background: linear-gradient(135deg, rgba(74, 108, 247, 0.02), rgba(94, 196, 172, 0.02)); }
+.rec-badge { font-size: 0.6rem; padding: 1px 6px; background: $color-primary-gradient; color: white; border-radius: $radius-round; font-weight: 600; margin-left: auto; }
 
 .events-loading { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 60px 0; color: $color-text-tertiary; }
 .el-spinner { width: 20px; height: 20px; border: 2px solid $color-border; border-top-color: $color-primary; border-radius: 50%; animation: spin 0.8s linear infinite; }
@@ -151,3 +192,4 @@ onMounted(() => { store.fetchEvents(); store.fetchMyRegistrations() })
   .ec-image { width: 100%; height: 140px; }
 }
 </style>
+

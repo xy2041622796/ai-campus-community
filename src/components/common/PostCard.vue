@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <article class="post-card" @click="router.push('/posts/' + post.id)">
     <!-- 作者信息 -->
     <div class="card-header">
@@ -12,6 +12,20 @@
             <span v-if="post.tags?.length" class="meta-tag">{{ post.tags[0] }}</span>
           </div>
         </div>
+
+    <!-- AI 结构化标签 -->
+    <div v-if="post.intent || post.emotion || post.summary" class="card-ai-badges">
+      <span v-if="post.intent" class="ai-badge intent-badge"> {{ intentLabel(post.intent) }} </span>
+      <span v-if="post.emotion" class="ai-badge emotion-badge" v-html="emotionEmoji(post.emotion)"></span>
+
+    </div>
+
+    <!-- AI 匹配度标签 -->
+    <div v-if="post.rank_score != null && post.rank_score > 0" class="card-match-badge">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/></svg>
+      <span>AI 匹配 {{ (post.rank_score * 10).toFixed(0) }}%</span>
+    </div>
+
       </div>
     </div>
 
@@ -92,6 +106,23 @@ function handleLike() {
 function handleFavorite() { favoriteStore.toggleFavorite(props.post.id) }
 
 function handleImageError(e) { e.target.style.display = 'none'; e.target.parentElement.style.display = 'none' }
+
+
+// AI 结构化标签辅助函数
+function intentLabel(intent) {
+  const map = { '分享': '分享', '求助': '求助', '吐槽': '吐槽', '招募': '招募', '交易': '交易' }
+  return map[intent] || intent
+}
+function emotionEmoji(emotion) {
+  // 用 SVG 图标代替 emoji
+  const icons = {
+    'positive': '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>',
+    'negative': '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF5252" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 17s1.5-2 4-2 4 2 4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>',
+    'neutral': '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9E9E9E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="8" y1="14" x2="16" y2="14"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>'
+  }
+  return icons[emotion] || icons.neutral
+}
+}
 
 function formatTime(dateStr) {
   const date = new Date(dateStr)
@@ -271,4 +302,40 @@ function formatTime(dateStr) {
 }
 
 .action-label { font-weight: 500; }
+
+/* AI 结构化标签 */
+.card-ai-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.ai-badge {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.intent-badge { background: rgba(74, 108, 247, 0.1); color: #4A6CF7; }
+.emotion-badge { background: rgba(94, 196, 172, 0.1); color: #5EC4AC; }
+
+
+/* AI 匹配度标签 */
+.card-match-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  background: linear-gradient(135deg, rgba(74, 108, 247, 0.1), rgba(94, 196, 172, 0.1));
+  border: 1px solid rgba(74, 108, 247, 0.2);
+  border-radius: 12px;
+  font-size: 0.7rem;
+  color: #4A6CF7;
+  font-weight: 600;
+  margin-top: 6px;
+}
+.card-match-badge svg { stroke: #4A6CF7; }
 </style>

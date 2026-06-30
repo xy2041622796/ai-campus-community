@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useCommentStore } from '@/stores/comment'
 
@@ -34,6 +34,9 @@ const emit = defineEmits(['cancelReply', 'created'])
 const commentStore = useCommentStore()
 const content = ref('')
 const submitting = ref(false)
+
+// Clear content when switching reply target
+watch(() => props.parentId, () => { content.value = '' })
 
 async function handleSubmit() {
   if (!content.value.trim() || submitting.value) return
@@ -70,3 +73,6 @@ async function handleSubmit() {
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 </style>
+
+
+

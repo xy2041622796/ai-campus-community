@@ -21,10 +21,15 @@
     <!-- Feed 工具栏 -->
     <div class="feed-toolbar">
       <div class="feed-tabs">
-        <button v-for="tab in feedTabs" :key="tab.key"
-          class="tab-btn" :class="{ active: activeTab === tab.key }"
-          @click="activeTab = tab.key">
-          {{ tab.label }}
+        <button class="tab-btn" :class="{ active: postStore.feedMode === 'recommended' }"
+          @click="switchFeedMode('recommended')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/></svg>
+          为你推荐
+        </button>
+        <button class="tab-btn" :class="{ active: postStore.feedMode === 'latest' }"
+          @click="switchFeedMode('latest')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          最新动态
         </button>
       </div>
       <button class="feed-create-btn" @click="router.push('/posts/new')">
@@ -81,55 +86,28 @@
   </div>
 </template>
 
+
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePostStore } from '@/stores/post'
-import { useLikeStore } from '@/stores/like'
-import { useFavoriteStore } from '@/stores/favorite'
-import { useAuthStore } from '@/stores/auth'
-import PostCard from '@/components/common/PostCard.vue'
 
 const router = useRouter()
 const postStore = usePostStore()
-const likeStore = useLikeStore()
-const favoriteStore = useFavoriteStore()
-const authStore = useAuthStore()
+const currentDate = ref(new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' }))
+const heroTitle = ref('校园动态')
+const onlineCount = ref(128)
 
-const activeTab = ref('latest')
-const feedTabs = [
-  { key: 'latest', label: '最新' },
-  { key: 'hot', label: '热门' },
-  { key: 'following', label: '关注' },
-]
+function switchFeedMode(mode) {
+  postStore.feedMode = mode
+  postStore.fetchPosts(true)
+}
 
-const onlineCount = computed(() => Math.floor(Math.random() * 50 + 12))
-
-const currentDate = computed(() => {
-  const now = new Date()
-  const weekdays = ['日', '一', '二', '三', '四', '五', '六']
-  return `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 周${weekdays[now.getDay()]}`
-})
-
-const heroTitle = computed(() => {
-  const messages = [
-    '「期末周图书馆占座攻略」',
-    '「校园周边美食大搜罗」',
-    '「社团招新季来啦！」',
-    '「你的校园生活 AI 助手」',
-  ]
-  return messages[Math.floor(Math.random() * messages.length)]
-})
-
-onMounted(async () => {
-  await postStore.fetchPosts(true)
-  if (authStore.user?.id) {
-    likeStore.fetchLikedPosts(authStore.user.id)
-    favoriteStore.fetchFavoritedPosts(authStore.user.id)
-    if (postStore.posts.length) likeStore.fetchLikeCounts(postStore.posts.map(p => p.id))
-  }
+onMounted(() => {
+  postStore.fetchPosts(true)
 })
 </script>
+
 
 <style scoped lang="scss">
 @use '@/assets/styles/variables' as *;
@@ -353,4 +331,3 @@ onMounted(async () => {
   .feed-empty { border-radius: $radius-md; }
 }
 </style>
-

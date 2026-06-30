@@ -1,15 +1,23 @@
-<template>
+﻿<template>
   <div class="search-page">
     <div class="search-header">
       <h1 class="search-title">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         搜索结果
       </h1>
-      <div class="search-input-wrap">
+      <div class="search-mode-bar">
+          <el-button size="small" :type="aiMode ? 'primary' : 'default'" @click="toggleAIMode">{{ aiMode ? 'AI智能搜索' : '关键词搜索' }}</el-button>
+        </div>
+        <div class="search-input-wrap">
         <el-input v-model="query" placeholder="搜索帖子或用户..." size="large" clearable @keyup.enter="doSearch" />
       </div>
     </div>
 
+    <div v-if="aiSummary" class="search-summary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      <span class="summary-label">AI 摘要：</span>
+      <span class="summary-text">{{ aiSummary }}</span>
+    </div>
     <div v-if="loading" class="search-loading">
       <div class="sl-spinner"></div>
       <span>搜索中...</span>
@@ -23,6 +31,7 @@
             <div class="ri-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
             <div class="ri-body">
               <div class="ri-title">{{ post.title }}</div>
+              <span v-if="post.similarity" class="ri-sim-badge">{{ (post.similarity * 100).toFixed(0) }}% 匹配</span>
               <div class="ri-desc">{{ post.content?.slice(0, 60) }}{{ post.content?.length > 60 ? '...' : '' }}</div>
             </div>
           </div>
@@ -57,7 +66,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePostStore } from '@/stores/post'
 import { useProfileStore } from '@/stores/profile'
@@ -70,6 +79,8 @@ const postStore = usePostStore()
 const profileStore = useProfileStore()
 const aiStore = useAIStore()
 
+const aiMode = ref(false)
+const aiSummary = ref('')
 const query = ref('')
 const posts = ref([])
 const users = ref([])
@@ -130,5 +141,36 @@ watch(() => route.query.q, (q) => {
 .ri-desc { font-size: $font-size-sm; color: $color-text-tertiary; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .search-empty { text-align: center; padding: 80px 20px; color: $color-text-tertiary; svg { stroke: $color-text-tertiary; } h3 { font-size: $font-size-lg; font-weight: 600; color: $color-text-primary; margin: 12px 0 4px; } p { font-size: $font-size-sm; margin: 0; } }
+.search-mode-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+
+.search-summary {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(74, 108, 247, 0.06), rgba(94, 196, 172, 0.06));
+  border: 1px solid rgba(74, 108, 247, 0.1);
+  border-radius: $radius-md;
+  margin-bottom: 16px;
+  font-size: $font-size-sm;
+  line-height: 1.5;
+  svg { stroke: $color-primary; flex-shrink: 0; margin-top: 2px; }
+}
+.summary-label { font-weight: 600; color: $color-primary; flex-shrink: 0; }
+.summary-text { color: $color-text-secondary; }
+
+.ri-sim-badge {
+  font-size: 0.6rem;
+  padding: 1px 6px;
+  background: rgba(74, 108, 247, 0.08);
+  color: $color-primary;
+  border-radius: $radius-round;
+  margin-left: 8px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
 .search-hint { text-align: center; padding: 80px 20px; color: $color-text-tertiary; }
 </style>
+
+

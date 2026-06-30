@@ -1,13 +1,11 @@
-<template>
+﻿<template>
   <div class="app-layout">
     <AppNavbar />
     <div class="app-body">
       <AppSidebar />
       <main class="app-content">
         <div class="content-inner"><router-view v-slot="{ Component }">
-          <transition name="page-fade" mode="out-in">
-            <component :is="Component" />
-          </transition>
+          <component :is="Component" :key="$route.fullPath" />
         </router-view></div>
       </main>
     </div>
