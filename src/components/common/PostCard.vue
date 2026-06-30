@@ -122,7 +122,6 @@ function emotionEmoji(emotion) {
   }
   return icons[emotion] || icons.neutral
 }
-}
 
 function formatTime(dateStr) {
   const date = new Date(dateStr)

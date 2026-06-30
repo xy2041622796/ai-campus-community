@@ -59,6 +59,17 @@ export default defineConfig({
             if (key) proxyReq.setHeader('Authorization', 'Bearer ' + key)
           })
         }
+      },
+      '/coze': {
+        target: 'https://api.coze.cn',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/coze/, ''),
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq, req) => {
+            const token = process.env.VITE_COZE_TOKEN || 'cztei_hPq7ohimp4DxBW1vwuRczat3OMrvwKkpRJWNDnJOVH0Wdt1cdRIs9tEbliV7YH1IO'
+            if (token) proxyReq.setHeader('Authorization', 'Bearer ' + token)
+          })
+        }
       }
     }
   }

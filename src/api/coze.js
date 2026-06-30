@@ -1,29 +1,45 @@
-﻿import { CozeAPI } from '@coze/api'
-
-const WORKFLOW_ID = '7656724184508792895'
-const TOKEN = import.meta.env.VITE_COZE_TOKEN || 'cztei_qGXfIVRCZgdvy0i5LOcHBhyW5vScE5jytKRKwiCbxge4wVC1cp41XVlbyF3IV4DgO'
-
-const coze = new CozeAPI({
-  token: TOKEN,
-  baseURL: 'https://api.coze.cn'
-})
+﻿const WORKFLOW_ID = '7656724184508792895'
 
 export async function analyzePost(content) {
   try {
-    const stream = coze.workflows.runs.stream({
-      workflow_id: WORKFLOW_ID,
-      parameters: { input: content }
+    const res = await fetch('/coze/v1/workflow/stream_run', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        workflow_id: WORKFLOW_ID,
+        parameters: { input: content }
+      })
     })
 
-    let result = null
-    for await (const event of stream) {
-      if (event && event.data && event.data.content) {
-        // content 是 JSON 字符串，如 '{"output":{"intent":"分享",...}}'
-        const parsed = JSON.parse(event.data.content)
-        result = parsed.output || parsed
+    if (!res.ok) {
+      const text = await res.text()
+      console.error('[Coze] HTTP error:', res.status, text)
+      return null
+    }
+
+    const reader = res.body.getReader()
+    const decoder = new TextDecoder()
+    let buffer = ''
+
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      buffer += decoder.decode(value, { stream: true })
+    }
+
+    for (const line of buffer.split('\n')) {
+      if (line.startsWith('data:')) {
+        try {
+          const eventData = JSON.parse(line.slice(5).trim())
+          if (eventData && eventData.content) {
+            const parsed = JSON.parse(eventData.content)
+            return parsed.output || parsed
+          }
+        } catch {}
       }
     }
-    return result
+
+    return null
   } catch (e) {
     console.error('[Coze] 分析失败:', e)
     return null
