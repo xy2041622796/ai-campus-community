@@ -66,7 +66,7 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/coze/, ''),
         configure: (proxy) => {
           proxy.on('proxyReq', (proxyReq, req) => {
-            const token = process.env.VITE_COZE_TOKEN || 'cztei_hPq7ohimp4DxBW1vwuRczat3OMrvwKkpRJWNDnJOVH0Wdt1cdRIs9tEbliV7YH1IO'
+            const token = process.env.VITE_COZE_TOKEN || 'pat_U1ixv00KaipP7zx8AQJamhokknFy1FZhlS1Zsft74uDwd0sELvX5ZE2kIFUTtl9P'
             if (token) proxyReq.setHeader('Authorization', 'Bearer ' + token)
           })
         }
