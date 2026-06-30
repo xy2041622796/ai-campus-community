@@ -1,24 +1,45 @@
-﻿// 使用 Agnes AI 分析（稳定，无需维护 token）
+﻿const WORKFLOW_ID = '7656724184508792895'
+
 export async function analyzePost(content) {
   try {
-    const res = await fetch('/agnes/v1/chat/completions', {
+    const res = await fetch('/coze/v1/workflow/stream_run', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'agnes-2.0-flash',
-        messages: [{
-          role: 'user',
-          content: '你是校园社区AI分析助手。请分析以下帖子内容，返回JSON格式：\n{\n  "intent": "分享|求助|吐槽|招募|交易",\n  "emotion": "positive|negative|neutral",\n  "topics": ["话题1", "话题2", "话题3"],\n  "summary": "一句话总结，20字以内"\n}\n\n帖子内容：' + content + '\n\n只返回JSON，不要任何解释。'
-        }]
+        workflow_id: WORKFLOW_ID,
+        parameters: { input: content }
       })
     })
-    if (!res.ok) return null
-    const data = await res.json()
-    const raw = data.choices?.[0]?.message?.content || '{}'
-    const cleaned = raw.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim()
-    return JSON.parse(cleaned)
+
+    if (!res.ok) {
+      console.error('[Coze] HTTP error:', res.status)
+      return null
+    }
+
+    const reader = res.body.getReader()
+    const decoder = new TextDecoder()
+    let buffer = ''
+
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      buffer += decoder.decode(value, { stream: true })
+    }
+
+    for (const line of buffer.split('\n')) {
+      if (line.startsWith('data:')) {
+        try {
+          const eventData = JSON.parse(line.slice(5).trim())
+          if (eventData && eventData.content) {
+            const parsed = JSON.parse(eventData.content)
+            return parsed.output || parsed
+          }
+        } catch {}
+      }
+    }
+    return null
   } catch (e) {
-    console.error('[AI] 分析失败:', e)
+    console.error('[Coze] 分析失败:', e)
     return null
   }
 }
