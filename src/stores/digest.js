@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+﻿import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { supabase } from '@/api/supabase'
 
@@ -48,14 +48,14 @@ export const useDigestStore = defineStore('digest', () => {
     const tomorrow = new Date(today)
     tomorrow.setDate(tomorrow.getDate() + 1)
 
-    const { data, error } = await supabase
+    const { data, error, count } = await supabase
       .from('profiles')
-      .select('id, nickname, avatar_url, college, postCount')
+      .select('id', { count: 'exact', head: true })
       .gte('created_at', today.toISOString())
       .lt('created_at', tomorrow.toISOString())
 
     if (error) throw error
-    return data?.length || 0
+    return count || 0
   }
 
   // 获取最活跃用户（今日发帖最多）
@@ -67,10 +67,9 @@ export const useDigestStore = defineStore('digest', () => {
 
     const { data, error } = await supabase
       .from('posts')
-      .select('author_id, count')
+      .select('author_id')
       .gte('created_at', today.toISOString())
       .lt('created_at', tomorrow.toISOString())
-      .order('count', { ascending: false })
 
     if (error) throw error
 
@@ -174,35 +173,39 @@ ${activeUsersInfo || '- 暂无数据'}
   async function fetchDailyDigest() {
     loading.value = true
     digest.value = null
+    let posts = [], commentCount = 0, newUserCount = 0, activeUsers = []
     try {
-      const [posts, commentCount, newUserCount, activeUsers] = await Promise.all([
+      const results = await Promise.all([
         fetchTodayPosts(),
         fetchTodayCommentCount(),
         fetchNewUserCount(),
         fetchActiveUsers(5)
       ])
+      posts = results[0]
+      commentCount = results[1]
+      newUserCount = results[2]
+      activeUsers = results[3]
 
       const aiDigest = await generateDailyDigest(posts, commentCount, newUserCount, activeUsers)
       digest.value = aiDigest
     } catch (e) {
       console.error('[Digest] 日报生成失败:', e)
-      // 降级方案：返回静态数据
       digest.value = {
-        summary: `今日社区共有 ${posts.length || 0} 篇新帖子，${commentCount || 0} 条评论，${newUserCount || 0} 位新朋友加入。`,
-        postCount: posts.length || 0,
-        commentCount: commentCount || 0,
-        newUserCount: newUserCount || 0,
+        summary: '今日社区共有 ' + posts.length + ' 篇新帖子，' + commentCount + ' 条评论，' + newUserCount + ' 位新朋友加入。',
+        postCount: posts.length,
+        commentCount: commentCount,
+        newUserCount: newUserCount,
         moods: [
           { label: '积极', percent: 40, colorClass: 'positive' },
           { label: '平静', percent: 30, colorClass: 'calm' },
           { label: '焦虑', percent: 15, colorClass: 'anxious' },
           { label: '兴奋', percent: 15, colorClass: 'excited' }
         ],
-        moodInsight: '社区情绪整体平稳，大家在分享日常和学习经验。',
+        moodInsight: '社区情绪整体平稳。',
         topics: ['校园生活', '学习分享'],
         hotPosts: [],
         activeUsers: activeUsers || [],
-        aiAdvice: '鼓励更多互动，可以尝试组织一些线上话题讨论提升活跃度。'
+        aiAdvice: '鼓励更多互动。'
       }
     } finally {
       loading.value = false

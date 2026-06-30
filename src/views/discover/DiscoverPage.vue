@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="discover-page">
     <div class="discover-header">
       <h1 class="discover-title">
@@ -7,7 +7,7 @@
         </svg>
         发现
       </h1>
-      <p class="discover-desc">探累校圖的精索</p>
+      <p class="discover-desc">探索校园的精彩</p>
     </div>
 
     <div class="tag-filter">
@@ -239,3 +239,4 @@ onMounted(async () => {
   .discover-grid { grid-template-columns: 1fr; }
 }
 </style>
+

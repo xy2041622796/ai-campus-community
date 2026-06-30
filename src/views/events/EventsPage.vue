@@ -8,7 +8,7 @@
           </svg>
           校园活动
         </h1>
-        <p class="events-desc">枚观校圖校园活动，一起参加</p>
+        <p class="events-desc">发现校园活动，一起参加</p>
       </div>
       <button class="events-create-btn" @click="router.push('/events/new')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -192,4 +192,6 @@ onMounted(async () => {
   .ec-image { width: 100%; height: 140px; }
 }
 </style>
+
+
 
