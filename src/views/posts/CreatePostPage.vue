@@ -31,8 +31,9 @@
 
         <el-form-item>
           <div class="form-actions">
+      <span v-if="reviewing" class="review-status">AI 审核中...</span>
             <el-button @click="router.back()">取消</el-button>
-            <el-button type="primary" :loading="submitting" @click="handleSubmit">
+            <el-button type="primary" :loading="submitting || reviewing.value" @click="handleSubmit">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               发布帖子
             </el-button>
@@ -72,6 +73,7 @@ import ImageUploader from '@/components/common/ImageUploader.vue'
 import TagSelector from '@/components/common/TagSelector.vue'
 import { useAIStore } from '@/stores/ai'
 import { analyzePost } from '@/api/coze'
+import { logAICall } from '@/utils/ai-log'
 
 const router = useRouter()
 const postStore = usePostStore()
@@ -79,6 +81,7 @@ const formRef = ref(null)
 const submitting = ref(false)
 const tagLoading = ref(false)
 const coverLoading = ref(false)
+const reviewing = ref(false)
 const polishLoading = ref(false)
 const aiStore = useAIStore()
 const showPolishDialog = ref(false)
@@ -86,6 +89,18 @@ const polishOriginal = ref('')
 const polishResult = ref('')
 
 const charCount = computed(() => form.content.length)
+
+// 从 AI 话题跳转过来时预填充
+const savedTopic = sessionStorage.getItem('ai-topic')
+if (savedTopic) {
+  try {
+    const topic = JSON.parse(savedTopic)
+    if (topic.title) form.title = topic.title
+    if (topic.description) form.content = topic.description
+    if (topic.tags?.length) form.tags = topic.tags
+    sessionStorage.removeItem('ai-topic')
+  } catch {}
+}
 const form = reactive({ title: '', content: '', images: [], tags: [] })
 const rules = {
   title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
@@ -164,10 +179,20 @@ async function handleSubmit() {
   const valid = await formRef.value?.validate().catch(() => false)
   if (!valid) return
   submitting.value = true
+  reviewing.value = true
   try {
+    const text = (form.title + ' ' + form.content).trim()
+
+    // 1. AI 内容审核
+    const review = await moderateContent(form.title, form.content)
+    if (!review.passed) {
+      ElMessage.warning('内容审核未通过：' + review.reason)
+      return
+    }
+
+    // 2. AI 结构化分析
     let intent, emotion, topics, summary
     try {
-      const text = (form.title + ' ' + form.content).trim()
       const structure = await analyzePost(text)
       if (structure) {
         intent = structure.intent
@@ -175,6 +200,22 @@ async function handleSubmit() {
         topics = structure.topics
         summary = structure.summary
       }
+    } catch (e) {
+      console.error('[CreatePost] AI analysis skipped:', e)
+    }
+
+    await postStore.createPost({
+      title: form.title,
+      content: form.content,
+      images: form.images,
+      tags: form.tags,
+      intent, emotion, topics, summary
+    })
+    ElMessage.success('发布成功！')
+    router.push('/')
+  } catch (e) { ElMessage.error(e.message || '发布失败') }
+  finally { submitting.value = false }
+}
     } catch (e) {
       console.error('[CreatePost] AI analysis skipped:', e)
     }
@@ -189,6 +230,39 @@ async function handleSubmit() {
     router.push('/')
   } catch (e) { ElMessage.error(e.message || '发布失败') }
   finally { submitting.value = false }
+}
+
+// AI 内容审核
+// AI 内容审核
+async function moderateContent(title, content) {
+  const start = Date.now()
+  try {
+    const res = await fetch('/agnes/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'agnes-2.0-flash',
+        messages: [{
+          role: 'user',
+          content: '你是校园社区内容审核员。请检查以下帖子内容是否合规。\\n规则：\\n1. 禁止广告推广（招聘、兼职、买卖等商业信息）\\n2. 禁止辱骂人身攻击\\n3. 禁止色情低俗内容\\n4. 禁止敏感政治言论\\n5. 禁止重复刷屏内容\\n\\n请返回 JSON：{"passed": true/false, "reason": "不通过的原因，通过则留空"}\\n帖子内容：\\n标题：' + title + '\\n正文：' + content
+        }]
+      })
+    })
+    if (!res.ok) {
+      logAICall({ service: 'agnes', action: 'moderate', latencyMs: Date.now() - start, success: false, errorMessage: 'HTTP ' + res.status })
+      return { passed: true }
+    }
+    const data = await res.json()
+    const raw = data.choices?.[0]?.message?.content || '{}'
+    const cleaned = raw.replace(/\`\`\`json\\s*/g, '').replace(/\`\`\`\\s*/g, '').trim()
+    const result = JSON.parse(cleaned)
+    logAICall({ service: 'agnes', action: 'moderate', latencyMs: Date.now() - start, success: true, metadata: { title: title.slice(0, 30), result } })
+    return result
+  } catch (e) {
+    console.error('[Moderator] 审核失败:', e)
+    logAICall({ service: 'agnes', action: 'moderate', latencyMs: Date.now() - start, success: false, errorMessage: e.message })
+    return { passed: true }
+  }
 }
 </script>
 
@@ -251,7 +325,25 @@ async function handleSubmit() {
 
 @media (max-width: 768px) { .polish-compare { flex-direction: column; } .pc-col + .pc-col { border-left: none; border-top: 1px solid $color-border-light; } }
 
-.form-actions {
+.form-actions {.review-status {
+  font-size: 0.8rem;
+  color: #4A6CF7;
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.review-status::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border: 2px solid #4A6CF7;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
   display: flex;
   justify-content: flex-end;
   gap: 12px;

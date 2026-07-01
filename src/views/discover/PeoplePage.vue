@@ -7,7 +7,7 @@
         </svg>
         发现同学
       </h1>
-      <p class="people-desc">根据兴趣标签推荐的同学，AI 帮你发现共同点</p>
+      <p class="people-desc">AI 根据你的兴趣和行为推荐的同学</p>
       <div class="people-ai-bar">
         <el-button size="small" :loading="reasonLoading" :disabled="!store.users.length" @click="generateReasons"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> AI 推荐理由</el-button>
       </div>
@@ -31,16 +31,29 @@
             <span v-if="u.grade"> · {{ u.grade }}</span>
           </div>
           <div v-if="u.bio" class="pc-bio">{{ u.bio.slice(0, 40) }}{{ u.bio.length > 40 ? '...' : '' }}</div>
-          <div v-if="aiReasons.get(u.id)" class="pc-ai-reason">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-            {{ aiReasons.get(u.id) }}
+            <!-- AI 推荐理由 -->
+            <div v-if="aiReasons.get(u.id) || getReasonSummary(u.id)" class="pc-ai-reason">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              {{ aiReasons.get(u.id) || getReasonSummary(u.id) }}
+            </div>
+                    <div v-if="matchScores.get(u.id)" class="pc-match-score">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            {{ matchScores.get(u.id) }}
           </div>
           <div class="pc-tags">
-            <span v-if="u.same_college" class="pc-tag badge-college">同校</span>
-            <span v-if="u.common_tags > 0" class="pc-tag badge-interest">共兴匹超 · {{ u.common_tags }}</span>
+              <span v-if="u.same_college" class="pc-tag badge-college">同校</span>
+              <span v-if="u.common_tags > 0" class="pc-tag badge-interest">共兴匹超 · {{ u.common_tags }}</span>
+            </div>
+            <!-- 关系详情 -->
+            <!-- AI 推荐理由 -->
+            <div v-if="graphRelationships.get(u.id)" class="pc-relations">
+              <div v-for="rel in graphRelationships.get(u.id).relationships" :key="rel.type" class="pc-rel-item">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                {{ rel.description }}
+              </div>
+            </div>
           </div>
         </div>
-        <FollowButton :target-id="u.id" class="pc-follow" />
       </div>
     </div>
 
@@ -48,14 +61,14 @@
       <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
       </svg>
-      <h3>没有更识的同学</h3>
-      <p>等更多加更再据兴品超，就会有更多的同学出现</p>
+      <h3>还没有发现更多同学</h3>
+      <p>完善你的兴趣标签，会有更多同学出现</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useRecommendStore } from '@/stores/recommend'
 import { useAIStore } from '@/stores/ai'
@@ -64,10 +77,30 @@ import FollowButton from '@/components/common/FollowButton.vue'
 
 const router = useRouter()
 const store = useRecommendStore()
+const graphRelationships = store.graphRelationships
+const aiReasons = ref(new Map())
 const aiStore = useAIStore()
 const authStore = useAuthStore()
-const aiReasons = ref(new Map())
+
 const reasonLoading = ref(false)
+
+
+// 生成关系图谱摘要
+function getReasonSummary(userId) {
+  const rel = graphRelationships.value?.get(userId)
+  if (!rel || !rel.relationships?.length) return null
+
+  const reasons = []
+  for (const r of rel.relationships) {
+    if (r === 'common_tags') reasons.push('共同兴趣')
+    else if (r === 'same_college') reasons.push('同校')
+    else if (r === 'mutual_like') reasons.push('共同喜欢')
+    else if (r === 'follower') reasons.push('关注了你')
+    else if (r === 'mutual_follow') reasons.push('互相关注')
+  }
+
+  return reasons.length > 0 ? reasons.slice(0, 3).join(' · ') : null
+}
 
 async function generateReasons() {
   if (!store.users.length || !authStore.user) return
@@ -122,6 +155,57 @@ onMounted(() => { store.fetchRecommendations() })
 .pc-name { font-weight: 600; color: $color-text-primary; margin-bottom: 2px; }
 .pc-meta { font-size: $font-size-xs; color: $color-text-tertiary; }
 .pc-bio { font-size: $font-size-sm; color: $color-text-secondary; margin-top: 4px; line-height: $line-height-normal; }
+
+.pc-match-score {
+
+
+.pc-ai-reason {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  color: #667788;
+  margin-top: 6px;
+}
+
+.pc-ai-reason svg {
+  stroke: #4A6CF7;
+  flex-shrink: 0;
+}
+.pc-relations {
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: rgba(74, 108, 247, 0.03);
+  border-radius: 8px;
+}
+
+.pc-rel-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: #667788;
+  margin-bottom: 4px;
+}
+
+.pc-rel-item:last-child { margin-bottom: 0; }
+
+.pc-rel-item svg {
+  stroke: #4A6CF7;
+  flex-shrink: 0;
+}
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  color: #4A6CF7;
+  background: rgba(74,108,247,0.06);
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-top: 6px;
+  font-weight: 500;
+}
+.pc-match-score svg { stroke: #4A6CF7; flex-shrink: 0; }
 
 .pc-tags { display: flex; gap: 4px; margin-top: 6px; }
 .pc-tag { font-size: 0.6rem; padding: 1px 8px; border-radius: $radius-round; font-weight: 500; }

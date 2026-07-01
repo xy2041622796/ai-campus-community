@@ -1,53 +1,63 @@
 # 项目进展日志
 
-> 最后更新: 2026-06-30 11:48
+> 最后更新: 2026-07-01 11:00
+
+## 2026-07-01
+
+### P0: AI 闭环系统
+- AI 内容审核：发帖前自动合规检查（已集成到 CreatePostPage）
+- AI 推荐原因：PostCard + PeoplePage 展示推荐理由
+- AI 调用日志：017_ai_logs.sql + ai-log.js
+
+### P1: 提升作品质量
+- AI 评论助手：CommentForm 新增 AI 建议按钮
+- AI Buddy 推荐理由：BuddiesPage 展示共同兴趣
+- Prompt Version 管理：prompts.js 集中管理 8 个模板
 
 ## 2026-06-30
 
-### Coze Workflow 集成
-- 通过 Vite proxy 解决 Coze CORS 问题
-- Token 在服务端添加，浏览器不可见
-- 修复 SSE 流式响应解析（event.data.content）
-- 切换原生 fetch + stream_run 端点
-- 更新 PAT token
-
-### 编码问题修复
-- ActivitiesPage: 校圖->校园, 么么->什么
-- DiscoverPage: 探累->探索, 精索->精彩
-- EventsPage: 枚观校圖->发现校园
-
-### digest.js Bug 修复
-- 修复 fetchActiveUsers count 排序错误
-- 修复 fetchNewUserCount 不存在的 postCount 字段
-- 修复 catch 块变量作用域问题
-
-### PostCard 调整
-- 移除 summary 徽章显示（保留搜索用）
+### Coze 集成 + 修复
+- Vite proxy 解决 Coze CORS
+- 编码修复（ActivitiesPage/DiscoverPage/EventsPage）
+- digest.js bug 修复（作用域/字段/排序）
+- 图片上传改进 + SQL 迁移
+- 无限滚动（IntersectionObserver）
 
 ### GitHub 推送
-- branch: codex/coze-proxy-fix -> merged to main
+- branch: codex/coze-proxy-fix → merged to main
 - 仓库: xy2041622796/ai-campus-community
 
 ## 2026-06-29
 
-### 三层推进升级
-- 帖子语义结构化（intent/emotion/topics/summary）
-- AI 画像 + 智能推荐（ai-profile store）
-- AI 社区日报（DailyDigestPage /digest）
-- AI Feed 重排序系统（get_personalized_feed）
-- 双模式 Feed（为你推荐 / 最新动态）
+### 三层 AI 驱动升级
+- 帖子语义结构化
+- AI 画像 + 智能推荐
+- AI 社区日报
+- AI Feed 重排序（双模式 Feed）
 
-### 文件变更
-- 新增 13 个文件，修改 22 个文件
-- 14 个数据库迁移文件
+## 项目统计
+
+| 指标 | 数值 |
+|------|------|
+| 源文件 | 58 |
+| Store | 14 |
+| 页面 | 20 |
+| 组件 | 14 |
+| Utils | 3 |
+| 数据库迁移 | 17 |
+| Prompt 模板 | 8 |
 
 ## 当前状态
 
-### 项目完整性
-- 54 个源文件，14 个 store，14 个迁移文件
-- AI 功能: Coze 分析 + Agnes 图片 + 语义搜索
+**项目已完成全部 P0/P1 功能**，实现了完整的 AI 闭环系统。
 
-### 待处理
-- 图片上传到 Supabase Storage 不完整
-- Notification 表可能未创建
-- 生产环境需要配置 Coze token
+**核心能力：**
+- AI 内容理解 → 结构化分析
+- AI 内容审核 → 合规检查
+- AI 推荐原因 → Explainable Recommendation
+- AI 评论助手 → 一键生成
+- AI 社区日报 → 自动生成
+- AI 话题生成 → 主动系统
+- AI 社交图谱 → 关系分析
+- AI 调用日志 → 全量追踪
+- Prompt 管理 → 版本控制

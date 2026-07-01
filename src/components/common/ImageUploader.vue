@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref } from 'vue'\nimport { ElMessage } from 'element-plus'
 import { supabase } from '@/api/supabase'
 
 const props = defineProps({
@@ -55,7 +55,7 @@ async function uploadFile(file) {
   const fileName = `${Date.now()}_${ext}`
   const filePath = props.path ? `${props.path}/${fileName}` : fileName
   const { error } = await supabase.storage.from(props.bucket).upload(filePath, file)
-  if (error) { console.error('Upload failed:', error); return null }
+  if (error) { console.error('Upload failed:', error); ElMessage.error('上传失败: ' + (error.message || '未知错误')); return null }
   const { data: { publicUrl } } = supabase.storage.from(props.bucket).getPublicUrl(filePath)
   return publicUrl
 }

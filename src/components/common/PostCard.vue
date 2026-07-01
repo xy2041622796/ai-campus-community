@@ -29,6 +29,11 @@
       </div>
     </div>
 
+    <!-- AI 推荐理由 -->
+    <div v-if="matchReason" class="card-reason">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+      {{ matchReason }}
+    </div>
     <!-- 正文 -->
     <div class="card-body">
       <h3 class="card-title">{{ post.title }}</h3>
@@ -82,6 +87,7 @@ import { useRouter } from 'vue-router'
 import { useLikeStore } from '@/stores/like'
 import { useFavoriteStore } from '@/stores/favorite'
 import UserAvatar from '@/components/common/UserAvatar.vue'
+import { generateRecommendReason } from '@/utils/helpers'
 
 const props = defineProps({ post: { type: Object, required: true } })
 const router = useRouter()
@@ -136,6 +142,24 @@ function formatTime(dateStr) {
 }
 </script>
 
+
+/* AI 推荐理由 */
+.card-reason {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(74, 108, 247, 0.04);
+  border-radius: 8px;
+  margin-bottom: 10px;
+  font-size: 0.75rem;
+  color: #667788;
+}
+
+.card-reason svg {
+  stroke: #4A6CF7;
+  flex-shrink: 0;
+}
 <style scoped lang="scss">
 @use '@/assets/styles/variables' as *;
 

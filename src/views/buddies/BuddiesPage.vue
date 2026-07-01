@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="buddies-page">
     <div class="buddies-header">
       <h1 class="buddies-title">
@@ -63,6 +63,13 @@ async function loadBuddies() {
 
 function selectCategory(tag) { activeTag.value = tag; loadBuddies() }
 
+function getBuddyReason(u) {
+  if (!u.interest_tags?.length) return null
+  const common = u.interest_tags.filter(t => categories.value.some(c => c.tag === t))
+  if (common.length > 0) return '共同兴趣：' + common.slice(0, 2).join('、')
+  return null
+}
+
 onMounted(loadCategories)
 </script>
 
@@ -99,5 +106,6 @@ onMounted(loadCategories)
 .bc-tags { display: flex; gap: 4px; margin-top: 4px; }
 .bc-tag { font-size: 0.6rem; padding: 1px 8px; background: $color-primary-subtle; color: $color-primary; border-radius: $radius-round; }
 .bc-follow { flex-shrink: 0; }
+.bc-reason { font-size: 0.7rem; color: #667788; margin-top: 4px; font-style: italic; }
 .buddies-empty { text-align: center; padding: 60px 0; color: $color-text-tertiary; }
 </style>

@@ -1,82 +1,103 @@
 # 项目发现与研究记录
 
-> 最后更新: 2026-06-30 11:48
+> 最后更新: 2026-07-01 11:00
 
 ## 架构决策
 
+### 技术架构
+- **前端:** Vue 3 + Vite + Element Plus + Pinia
+- **后端:** Supabase（Auth + PostgreSQL + Storage + RLS）
+- **AI:** Coze Workflow（内容分析）+ Agnes AI（图片/润色/审核）
+- **部署:** Vercel（前端+Serverless）+ Supabase（数据库+认证）
+
 ### 认证方案
-- 学号映射为邮箱格式 `s{{学号}}@campus.auth` 兼容 Supabase Auth
-- 触发器自动在注册时创建 profiles 记录
+- 学号映射邮箱 `s{学号}@campus.auth` 兼容 Supabase Auth
+- 触发器自动创建 profiles 记录
 
-### 数据库设计
-- PostgreSQL RLS 行级安全策略控制数据访问
-- 触发器自动处理通知和更新时间戳
-- pgvector 支持语义搜索
-- tsvector 支持全文搜索
+### AI 集成策略
+- 内容分析: Coze Workflow → /coze proxy → api.coze.cn
+- 图片/润色/审核: Agnes AI → /agnes proxy → apihub.agnes-ai.com
+- 两种代理模式：开发环境 Vite proxy + 生产环境 Vercel API 路由
+- Token 在服务端，浏览器不可见
 
-### AI 集成
-- 内容分析: Coze Workflow（/coze proxy -> api.coze.cn）
-- 图片生成: Agnes AI（/agnes proxy -> apihub.agnes-ai.com）
-- 文本润色 / embedding: Agnes AI
+### Prompt 管理
+- 集中在 src/utils/prompts.js，8 个模板
+- 支持版本追踪（v1.0）和 description
+- 可按需 A/B 测试不同版本
 
-### Coze 集成细节
-- SDK: @coze/api, 方法: workflows.runs.stream()
-- 通过 Vite proxy 转发请求（解决 CORS）
-- Token 在服务端 vite.config.js 中，浏览器不可见
-- 工作流 ID: 7656724184508792895
-- 返回格式: {{ intent, emotion, topics, summary }}
-- 端点: POST /v1/workflow/stream_run（SSE 流）
+## AI 闭环系统
+
+### AI 内容审核（Moderator）
+- 发帖前自动调 Agnes AI 检查合规性
+- 规则：广告/辱骂/色情/政治/重复
+- 失败时默认放行（不影响正常使用）
+- 已集成到 ai-log.js 记录日志
+
+### AI 推荐原因（Explainable Recommendation）
+- PostCard：基于 matched_topics/intent/emotion 显示推荐理由
+- PeoplePage：显示关系图谱摘要（共同兴趣/同校/共同喜欢）
+- 两种数据源：AI 生成 + 关系图谱
+- PostDetailPage：CommentForm 新增 AI 评论建议按钮
+
+### AI 评论助手
+- CommentForm 新增"AI 建议"按钮
+- 支持回复建议和帖子评论建议
+- 20 字以内的简短友好回复
+
+### AI 社交关系图谱
+- batch_analyze_relationships 批量 RPC（2 次替代 N+1 次）
+- 关系类型：common_tags / same_college / mutual_like / follower
+- PeoplePage 自动展示关系详情
+
+### AI 主动系统
+- ai-topics store 检测社区活跃度（6小时阈值）
+- 冷清时生成通用话题，活跃时基于热帖延伸
+- 首页 Feed 顶部显示 AI 话题卡片
+
+### AI 调用日志
+- ai_logs 表记录所有 AI API 调用
+- 集成到 moderation 和 topic generation
+- 支持统计查询（服务/操作/成功率/延迟）
 
 ## 已知问题
 
-### 1. SQL 文件编码
+### SQL 文件编码
 - 部分 SQL 迁移文件注释乱码（不影响功能）
 
-### 2. Notification 表缺失
-- notification.js store 中有 PGRST205 错误处理
-
-### 3. 图片上传
-- ImageUploader 组件存在，Storage bucket 配置不明确
-
-### 4. Vite Proxy
-- /agnes 和 /coze proxy 有硬编码的 fallback token
-
-## AI 驱动升级细节
-
-### 帖子语义结构化
-- posts 表扩展: intent/emotion/topics/summary
-- 发帖时自动调用 Coze 分析（不阻塞提交）
-- PostCard 显示 intent 徽章和 emotion 图标
-
-### AI 用户画像
-- ai-profile.js 分析行为数据生成画像
-- 包含: 兴趣标签、活跃时段、社交倾向、行为分数
-
-### AI 社区日报
-- digest.js 聚合今日数据 + AI 生成日报
-- 失败时有降级方案（静态数据）
-
-### Feed 排序
-- RPC: calculate_post_rank_score / get_personalized_feed
-- 评分: 热度 + 时间 + 兴趣匹配 + 社交关系
+### Vite Proxy 硬编码
+- /agnes 和 /coze proxy 有 fallback token
+- 生产环境需要 Vercel 环境变量
 
 ## 技术细节
 
 ### 组件结构
-- common/: 通用业务组件
-- layout/: 导航栏、侧边栏、底部导航
-- views/: 按功能模块分组的页面组件
+- common/: CommentForm, CommentList, PostCard, TagSelector, ImageUploader 等
+- layout/: AppNavbar, AppSidebar, BottomNav
+- views/: 按功能模块分组（20 个页面）
 
 ### Store 结构（14 个）
-- 各业务领域独立 store，模块化设计
+- ai.js: AI 能力封装
+- ai-profile.js: 用户 AI 画像
+- ai-topics.js: AI 话题生成
+- digest.js: AI 社区日报
+- recommend.js: 智能推荐（含关系图谱）
+- post.js: 帖子管理（含结构化字段）
+- 其他业务 store
+
+### 数据库设计
+- 17 个迁移文件覆盖完整数据模型
+- pgvector 支持语义搜索
+- RLS 行级安全策略控制数据访问
+- 触发器处理通知和时间戳
 
 ## 环境配置
 
 ### Supabase
 - URL: https://lomdzbulgkowyomrjygr.supabase.co
-- 14 个迁移文件
+- 17 个迁移文件
+- Storage buckets: post-images, avatars
 
 ### 代理配置
-- /agnes -> apihub.agnes-ai.com
-- /coze -> api.coze.cn
-- /api -> Vercel
+- /agnes → apihub.agnes-ai.com（图片/润色/审核）
+- /coze → api.coze.cn（内容分析）
+- /api → Vercel（生产环境 Coze 代理）

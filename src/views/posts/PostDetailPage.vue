@@ -61,7 +61,7 @@
         <span>回复复 @{{ replyTo.author?.nickname }}</span>
         <button @click="cancelReply">取消回复</button>
       </div>
-      <CommentForm :key="replyTo ? replyTo.id : 'default'" :post-id="post.id" :reply-to="replyTo?.author?.nickname" :parent-id="replyTo?.id" @created="onCommentCreated" @cancel-reply="cancelReply" />
+      <CommentForm :key="replyTo ? replyTo.id : 'default'" :post-id="post.id" :post-content="post.content" :reply-to="replyTo?.author?.nickname" :parent-id="replyTo?.id" @created="onCommentCreated" @cancel-reply="cancelReply" />
       <CommentList :post-id="post.id" @reply="handleReply" />
     </section>
     </div>

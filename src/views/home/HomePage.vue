@@ -39,6 +39,34 @@
     </div>
 
     <!-- 帖子列表 -->
+    <!-- AI 话题推荐 -->
+    <div v-if="aiTopics.topics.length" class="ai-topics-section">
+      <div class="ai-topics-header">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+        <span class="ai-topics-title">{{ aiTopics.quietMode ? '&#x1f4a1; 社区有点冷清，来聊聊这些吧' : '&#x1f525; 热门讨论话题' }}</span>
+        <button v-if="!aiTopics.loading" class="ai-topics-refresh" @click="loadTopics">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        </button>
+        <span v-else class="ai-topics-loading"></span>
+      </div>
+      <div class="ai-topics-list">
+        <div v-for="(topic, idx) in aiTopics.topics.slice(0, 3)" :key="idx" class="ai-topic-card" @click="goCreatePost(topic)">
+          <div class="ai-topic-rank">{{ idx + 1 }}</div>
+          <div class="ai-topic-body">
+            <div class="ai-topic-title">{{ topic.title }}</div>
+            <div class="ai-topic-desc">{{ topic.description }}</div>
+            <div v-if="topic.tags?.length" class="ai-topic-tags">
+              <span v-for="tag in topic.tags" :key="tag" class="ai-topic-tag">{{ tag }}</span>
+            </div>
+          </div>
+          <button class="ai-topic-join" @click.stop="goCreatePost(topic)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            参与讨论
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div v-if="postStore.posts.length" class="feed-list">
       <PostCard v-for="post in postStore.posts" :key="post.id" :post="post" />
 
@@ -50,14 +78,19 @@
         </div>
       </div>
 
-      <div v-if="postStore.hasMore && !postStore.loading" class="feed-more">
-        <button class="more-btn" @click="postStore.fetchPosts()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-          加载更多
-        </button>
+      <!-- 无限滚动触发元素 -->
+      <div ref="scrollSentinel" class="scroll-sentinel"></div>
+
+      <div v-if="postStore.loading" class="feed-loading">
+        <div class="feed-more-spinner"></div>
+        <span>加载更多...</span>
       </div>
 
-      <div v-else-if="!postStore.loading" class="feed-end">
+      <div v-if="!postStore.hasMore && !postStore.loading" class="feed-end">
+        <div class="end-line"></div>
+        <span class="end-label">已经到底了</span>
+        <div class="end-line"></div>
+      </div>
         <div class="end-line"></div>
         <span class="end-label">已经到底了</span>
         <div class="end-line"></div>
@@ -88,29 +121,156 @@
 
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
-import { usePostStore } from '@/stores/post'
+import { usePostStore } from '@/stores/post'\nimport { useAITopicsStore } from '@/stores/ai-topics'
 
 const router = useRouter()
-const postStore = usePostStore()
+const postStore = usePostStore()\nconst aiTopics = useAITopicsStore()
+const scrollSentinel = ref(null)
+let scrollObserver = null
+const scrollLoading = ref(false)
+
+// 无限滚动：当 sentinel 元素进入视口时加载更多
+onMounted(() => {
+  postStore.fetchPosts(true)
+  loadTopics()
+
+  scrollObserver = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting && postStore.hasMore && !postStore.loading && !scrollLoading.value) {
+      scrollLoading.value = true
+      if (postStore.feedMode === 'latest') {
+        postStore.fetchPosts()
+      } else {
+        postStore.fetchPersonalizedFeed()
+      }
+      // 延迟重置 loading 状态
+      setTimeout(() => { scrollLoading.value = false }, 500)
+    }
+  }, { rootMargin: '200px' })
+
+  // 等待 DOM 渲染后观察 sentinel
+  nextTick(() => {
+    if (scrollSentinel.value) scrollObserver.observe(scrollSentinel.value)
+  })
+})
+
+onUnmounted(() => {
+  if (scrollObserver) scrollObserver.disconnect()
+})
 const currentDate = ref(new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' }))
 const heroTitle = ref('校园动态')
 const onlineCount = ref(128)
 
-function switchFeedMode(mode) {
-  postStore.feedMode = mode
-  postStore.fetchPosts(true)
+
+function goCreatePost(topic) {
+  sessionStorage.setItem('ai-topic', JSON.stringify(topic))
+  router.push('/posts/new')
 }
 
-onMounted(() => {
-  postStore.fetchPosts(true)
-})
-</script>
+async function loadTopics() {
+  await aiTopics.generateTopicSuggestions()
+}
+function switchFeedMode(mode) {
+  postStore.feedMode = mode
+  if (mode === 'recommended') postStore.fetchPersonalizedFeed(true)
+  else postStore.fetchPosts(true)
 
+
+
+  </script>
 
 <style scoped lang="scss">
 @use '@/assets/styles/variables' as *;
+
+/* AI 话题推荐 */
+.ai-topics-section {
+  background: white;
+  border: 1px solid #e8ecf1;
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 16px;
+  transition: box-shadow 0.2s ease;
+}
+.ai-topics-section:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+
+.ai-topics-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.ai-topics-header svg { color: #4A6CF7; }
+.ai-topics-title { font-weight: 600; font-size: 0.95rem; color: #1a1a2e; flex: 1; }
+.ai-topics-refresh {
+  background: none; border: none; cursor: pointer; color: #8899aa; padding: 4px;
+  transition: transform 0.2s ease;
+}
+.ai-topics-refresh:hover { color: #4A6CF7; transform: rotate(180deg); }
+.ai-topics-loading {
+  width: 14px; height: 14px; border: 2px solid #e8ecf1; border-top: 2px solid #4A6CF7;
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+
+.ai-topics-list { display: flex; flex-direction: column; gap: 8px; }
+
+.ai-topic-card {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px; border-radius: 12px;
+  cursor: pointer; transition: background 0.15s ease;
+}
+.ai-topic-card:hover { background: rgba(74,108,247,0.04); }
+
+.ai-topic-rank {
+  width: 28px; height: 28px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; font-weight: 700;
+  background: rgba(74,108,247,0.08); color: #4A6CF7; flex-shrink: 0;
+}
+.ai-topic-card:nth-child(1) .ai-topic-rank { background: linear-gradient(135deg,#FFD700,#FFA500); color: white; }
+.ai-topic-card:nth-child(2) .ai-topic-rank { background: linear-gradient(135deg,#C0C0C0,#A0A0A0); color: white; }
+.ai-topic-card:nth-child(3) .ai-topic-rank { background: linear-gradient(135deg,#CD7F32,#B8860B); color: white; }
+
+.ai-topic-body { flex: 1; min-width: 0; }
+.ai-topic-title { font-weight: 600; font-size: 0.9rem; color: #1a1a2e; margin-bottom: 4px; }
+.ai-topic-desc { font-size: 0.8rem; color: #667788; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.ai-topic-tags { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+.ai-topic-tag {
+  font-size: 0.65rem; padding: 1px 8px; border-radius: 10px;
+  background: rgba(74,108,247,0.08); color: #4A6CF7; font-weight: 500;
+}
+
+.ai-topic-join {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 6px 14px; border: none; border-radius: 8px;
+  background: linear-gradient(135deg,#4A6CF7,#5EC4AC); color: white;
+  font-size: 0.8rem; font-weight: 500; cursor: pointer; flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+.ai-topic-join:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(74,108,247,0.3); }
+
+
+/* 无限滚动 */
+.scroll-sentinel { height: 1px; }
+
+.feed-more-spinner {
+  width: 20px; height: 20px;
+  border: 2px solid #e8ecf1;
+  border-top: 2px solid #4A6CF7;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto;
+}
+
+.feed-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px 0;
+  color: #8899aa;
+  font-size: 0.85rem;
+}
 
 .home-page { animation: pageFadeIn 0.4s ease; }
 @keyframes pageFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
