@@ -263,10 +263,33 @@ export const useAIStore = defineStore('ai', () => {
       return null
     }
   }
+
+  // ============ AI 活动助手 ============
+  async function generateEvent(userInput) {
+    try {
+      const prompt = "You are a campus event planner. User wants to organize an event and typed: " + userInput + ". Generate a complete event plan. Return JSON: {title, description(200 chars), eventDate(ISO string), location, maxParticipants, deadline(ISO string)}. title under 30 chars. description includes content, flow, significance. location should be a real campus place. maxParticipants reasonable for the event type. Only return pure JSON."
+      const res = await fetch('/agnes/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'agnes-2.0-flash',
+          messages: [{ role: 'user', content: prompt }]
+        })
+      })
+      if (!res.ok) throw new Error('生成失败')
+      const data = await res.json()
+      const raw = data.choices?.[0]?.message?.content || '{}'
+      const cleaned = raw.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim()
+      return JSON.parse(cleaned)
+    } catch (e) {
+      console.error('[AI] generateEvent error:', e)
+      return null
+    }
+  }
   return {
     polishing, suggesting, generating, semanticSearchLoading,
     polishContent, suggestTags, generateCoverImage,
     semanticSearch, generateSearchSummary, generateRecommendationReason,
-    planEvent, recommendEvents, analyzePostStructure, generatePost
+    planEvent, recommendEvents, analyzePostStructure, generatePost, generateEvent
   }
 })

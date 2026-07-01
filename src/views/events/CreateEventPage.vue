@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="create-event-page">
     <div class="ce-header">
       <button class="back-btn" @click="router.back()">
@@ -6,6 +6,35 @@
         返回
       </button>
       <h1 class="ce-title">创建活动</h1>
+    </div>
+
+    <!-- AI 活动助手 -->
+    <div v-if="!form.title" class="ai-assistant-section">
+      <div class="ai-assistant-header">
+        <div class="ai-assistant-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div>
+          <h3 class="ai-assistant-title">AI 活动助手</h3>
+          <p class="ai-assistant-desc">描述你想组织的活动，AI 自动生成完整方案</p>
+        </div>
+      </div>
+      <div class="ai-assistant-input">
+        <el-input
+          v-model="quickInput"
+          type="textarea"
+          :rows="3"
+          placeholder="例如：周末想组织烧烤&#10;下周五晚上搞个电影之夜&#10;组织一场编程马拉松"
+          :disabled="quickGenerating"
+          @keyup.ctrl.enter="handleQuickGenerate"
+        />
+        <div class="ai-assistant-actions">
+          <span class="ai-assistant-hint">Ctrl + Enter 快速生成</span>
+          <el-button type="primary" :loading="quickGenerating" :disabled="!quickInput.trim()" @click="handleQuickGenerate">
+            AI 生成活动方案
+          </el-button>
+        </div>
+      </div>
     </div>
     <div class="form-card">
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
@@ -82,6 +111,8 @@ const submitting = ref(false)
 const aiStore = useAIStore()
 const planResult = ref(null)
 const planLoading = ref(false)
+const quickInput = ref("")
+const quickGenerating = ref(false)
 
 const form = reactive({
   title: '', description: '', event_date: null, location: '',
@@ -101,6 +132,30 @@ async function handleAISuggest() {
   if (result) form.description = result
 }
 
+
+async function handleQuickGenerate() {
+  if (!quickInput.value.trim()) return
+  quickGenerating.value = true
+  try {
+    const result = await aiStore.generateEvent(quickInput.value)
+    if (result) {
+      form.title = result.title || ""
+      form.description = result.description || ""
+      form.location = result.location || ""
+      if (result.eventDate) form.event_date = new Date(result.eventDate)
+      if (result.maxParticipants) form.max_participants = result.max_participants
+      if (result.deadline) form.deadline = new Date(result.deadline)
+      ElMessage.success("AI 已生成活动方案，请检查后发布")
+    } else {
+      ElMessage.error("AI 生成失败，请重试")
+    }
+  } catch (e) {
+    console.error("[Event] quick generate error:", e)
+    ElMessage.error("AI 服务异常")
+  } finally {
+    quickGenerating.value = false
+  }
+}
 async function handleAIPlan() {
   if (!form.title.trim()) { ElMessage.info('请先填写活动标题'); return }
   planLoading.value = true
@@ -129,6 +184,19 @@ async function handleSubmit() {
 }
 </script>
 
+
+/* AI 活动助手 */
+.ai-assistant-section { background: linear-gradient(135deg, rgba(74,108,247,0.06), rgba(94,196,172,0.06)); border: 1px solid rgba(74,108,247,0.15); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+.ai-assistant-header { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+.ai-assistant-icon { width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #4A6CF7, #5EC4AC); display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0; }
+.ai-assistant-title { font-size: 1.1rem; font-weight: 600; color: #1a1a2e; margin: 0 0 4px; }
+.ai-assistant-desc { font-size: 0.85rem; color: #667788; margin: 0; }
+.ai-assistant-input { display: flex; flex-direction: column; gap: 12px; }
+.ai-assistant-input :deep(.el-textarea__inner) { border-radius: 12px; border: 1px solid #e2e8f0; font-size: 0.95rem; line-height: 1.6; resize: none; }
+.ai-assistant-input :deep(.el-textarea__inner:focus) { border-color: #4A6CF7; box-shadow: 0 0 0 3px rgba(74,108,247,0.1); }
+.ai-assistant-actions { display: flex; align-items: center; justify-content: space-between; }
+.ai-assistant-hint { font-size: 0.8rem; color: #999; }
+.ai-assistant-actions .el-button { background: linear-gradient(135deg, #4A6CF7, #5EC4AC); border: none; font-weight: 600; }
 <style scoped lang="scss">
 @use '@/assets/styles/variables' as *;
 
@@ -166,4 +234,3 @@ async function handleSubmit() {
 }
 .ce-actions { display: flex; justify-content: flex-end; gap: 12px; }
 </style>
-
