@@ -1,4 +1,4 @@
-﻿import { defineStore } from 'pinia'
+import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { supabase } from '@/api/supabase'
 
@@ -20,22 +20,44 @@ export const useLikeStore = defineStore('like', () => {
   async function toggleLike(postId) {
     if (toggling.value) return
     toggling.value = true
+    let wasLiked = false
+    let previousCount = 0
     try {
       const { data: { user } } = await supabase.auth.getSession()
       if (!user) return
 
-      if (isLiked(postId)) {
-        await supabase.from('likes').delete()
-          .eq('post_id', postId).eq('user_id', user.id)
+      wasLiked = isLiked(postId)
+      previousCount = likeCounts.value[postId] || 0
+
+      // Optimistic update
+      if (wasLiked) {
         likedPosts.value.delete(postId)
         if (likeCounts.value[postId]) likeCounts.value[postId]--
       } else {
-        await supabase.from('likes').insert({ post_id: postId, user_id: user.id })
         likedPosts.value.add(postId)
         if (likeCounts.value[postId]) likeCounts.value[postId]++
       }
-    } catch (e) { console.error('[Like]', e) }
-    finally { toggling.value = false }
+
+      // API call
+      if (wasLiked) {
+        const { error } = await supabase.from('likes').delete()
+          .eq('post_id', postId).eq('user_id', user.id)
+        if (error) throw error
+      } else {
+        const { error } = await supabase.from('likes').insert({ post_id: postId, user_id: user.id })
+        if (error) throw error
+      }
+    } catch (e) {
+      console.error('[Like]', e)
+      // Rollback optimistic update
+      if (wasLiked) {
+        likedPosts.value.add(postId)
+        likeCounts.value[postId] = previousCount
+      } else {
+        likedPosts.value.delete(postId)
+        likeCounts.value[postId] = previousCount
+      }
+    } finally { toggling.value = false }
   }
 
   async function fetchLikeCount(postId) {

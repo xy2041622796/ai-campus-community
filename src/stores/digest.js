@@ -1,10 +1,12 @@
-﻿import { defineStore } from 'pinia'
+import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { supabase } from '@/api/supabase'
 
 export const useDigestStore = defineStore('digest', () => {
   const digest = ref(null)
   const loading = ref(false)
+  const lastFetchTime = ref(null)
+  const lastStats = ref({ postCount: 0, commentCount: 0, newUserCount: 0 })
 
   // 获取当日所有帖子（用于 AI 分析）
   async function fetchTodayPosts() {
@@ -188,6 +190,8 @@ ${activeUsersInfo || '- 暂无数据'}
 
       const aiDigest = await generateDailyDigest(posts, commentCount, newUserCount, activeUsers)
       digest.value = aiDigest
+      lastStats.value = { postCount: posts.length, commentCount, newUserCount }
+      lastFetchTime.value = Date.now()
     } catch (e) {
       console.error('[Digest] 日报生成失败:', e)
       digest.value = {
@@ -212,5 +216,51 @@ ${activeUsersInfo || '- 暂无数据'}
     }
   }
 
-  return { digest, loading, fetchDailyDigest }
+
+  // Incremental refresh - only update changed data, no clearing
+  async function incrementalRefresh() {
+    if (!digest.value) {
+      return fetchDailyDigest()
+    }
+
+    loading.value = true
+    try {
+      const [posts, commentCount, newUserCount, activeUsers] = await Promise.all([
+        fetchTodayPosts(),
+        fetchTodayCommentCount(),
+        fetchNewUserCount(),
+        fetchActiveUsers(5)
+      ])
+
+      const newPostCount = posts.length
+      const old = lastStats.value
+      const hasChanges = (
+        newPostCount !== old.postCount ||
+        commentCount !== old.commentCount ||
+        newUserCount !== old.newUserCount
+      )
+
+      // Always update numeric stats immediately (no flash)
+      Object.assign(digest.value, {
+        postCount: newPostCount,
+        commentCount: commentCount,
+        newUserCount: newUserCount,
+        activeUsers: activeUsers
+      })
+
+      lastStats.value = { postCount: newPostCount, commentCount, newUserCount }
+      lastFetchTime.value = Date.now()
+
+      // Only re-run AI generation if meaningful changes
+      if (hasChanges) {
+        const aiDigest = await generateDailyDigest(posts, commentCount, newUserCount, activeUsers)
+        Object.assign(digest.value, aiDigest)
+      }
+    } catch (e) {
+      console.error("[Digest] Incremental refresh failed:", e)
+    } finally {
+      loading.value = false
+    }
+  }
+  return { digest, loading, fetchDailyDigest, incrementalRefresh }
 })

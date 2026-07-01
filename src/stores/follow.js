@@ -6,6 +6,7 @@ export const useFollowStore = defineStore('follow', () => {
   const following = ref([])
   const followers = ref([])
   const followingList = ref([])
+  const lastFetchTime = ref(null)
   const loading = ref(false)
 
   async function fetchFollowing(userId) {
@@ -39,6 +40,7 @@ export const useFollowStore = defineStore('follow', () => {
   }
 
   async function fetchFollowers(userId) {
+    if (lastFetchTime.value && Date.now() - lastFetchTime.value < 30000) return
     const { data } = await supabase.from('follows').select('follower_id').eq('following_id', userId)
     if (!data) return
     const ids = data.map(f => f.follower_id)
@@ -56,5 +58,5 @@ export const useFollowStore = defineStore('follow', () => {
     followingList.value = profiles || []
   }
 
-  return { following, followers, followingList, loading, fetchFollowing, isFollowing, followUser, unfollowUser, fetchFollowers, fetchFollowingProfiles }
+  return { following, followers, followingList, loading, lastFetchTime, fetchFollowing, isFollowing, followUser, unfollowUser, fetchFollowers, fetchFollowingProfiles }
 })

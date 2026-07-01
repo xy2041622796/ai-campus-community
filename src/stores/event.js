@@ -7,8 +7,10 @@ export const useEventStore = defineStore('event', () => {
   const currentEvent = ref(null)
   const myRegistrations = ref([])
   const loading = ref(false)
+  const lastFetchTime = ref(null)
 
-  async function fetchEvents() {
+  async function fetchEvents(force = false) {
+    if (!force && lastFetchTime.value && Date.now() - lastFetchTime.value < 30000) return
     loading.value = true
     try {
       const { data, error } = await supabase
@@ -17,16 +19,21 @@ export const useEventStore = defineStore('event', () => {
         .order('event_date', { ascending: true })
       if (error) throw error
       events.value = data || []
-      // Get participant counts for each event
-      for (const ev of events.value) {
-        const { count } = await supabase
+      // Batch fetch participant counts
+      if (events.value.length > 0) {
+        const eventIds = events.value.map(e => e.id)
+        const { data: participants, error: partError } = await supabase
           .from('event_participants')
-          .select('*', { count: 'exact', head: true })
-          .eq('event_id', ev.id)
+          .select('event_id')
+          .in('event_id', eventIds)
           .eq('status', 'registered')
-        ev.participant_count = count || 0
+        if (!partError && participants) {
+          const counts = {}
+          participants.forEach(p => { counts[p.event_id] = (counts[p.event_id] || 0) + 1 })
+          events.value.forEach(ev => { ev.participant_count = counts[ev.id] || 0 })
+        }
       }
-    } finally { loading.value = false }
+    } catch (e) { console.error('[Event]', e) } finally { loading.value = false; lastFetchTime.value = Date.now() }
   }
 
   async function fetchEventById(eventId) {
@@ -81,7 +88,7 @@ export const useEventStore = defineStore('event', () => {
   const upcomingEvents = computed(() => events.value.filter(e => e.status === 'open'))
 
   return {
-    events, currentEvent, myRegistrations, loading, registeredIds, upcomingEvents,
+    events, currentEvent, myRegistrations, loading, registeredIds, upcomingEvents, lastFetchTime,
     fetchEvents, fetchEventById, createEvent, joinEvent, leaveEvent, fetchMyRegistrations
   }
 })

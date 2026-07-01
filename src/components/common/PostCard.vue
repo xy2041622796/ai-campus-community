@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <article class="post-card" @click="router.push('/posts/' + post.id)">
     <!-- 作者信息 -->
     <div class="card-header">
@@ -95,6 +95,8 @@ const likeStore = useLikeStore()
 const favoriteStore = useFavoriteStore()
 
 const likeCount = computed(() => likeStore.likeCounts[props.post.id] || 0)
+
+const matchReason = computed(() => generateRecommendReason(props.post, null))
 
 onMounted(() => {
   if (likeStore.likeCounts[props.post.id] === undefined) {

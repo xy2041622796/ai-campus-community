@@ -1,4 +1,4 @@
-﻿import { defineStore } from 'pinia'
+import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { supabase } from '@/api/supabase'
 import { analyzePost } from '@/api/coze'
@@ -96,15 +96,10 @@ export const useAITopicsStore = defineStore('ai-topics', () => {
     } finally {
       loading.value = false
     }
-    return {
-      title: topic.title,
-      content: topic.description,
-      tags: topic.tags || []
-    }
   }
 
   return {
     topics, loading, lastGenerated, quietMode,
-    generateTopicSuggestions, checkCommunityActivity, adoptTopic
+    generateTopicSuggestions, checkCommunityActivity
   }
 })

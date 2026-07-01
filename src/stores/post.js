@@ -1,4 +1,4 @@
-﻿import { defineStore } from 'pinia'
+import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { supabase } from '@/api/supabase'
 
@@ -8,11 +8,12 @@ export const usePostStore = defineStore('post', () => {
   const loading = ref(false)
   const page = ref(0)
   const hasMore = ref(true)
-  const PAGE_SIZE = 10
+  const lastFetchTime = ref(null)
   const feedMode = ref('recommended')
 
   async function fetchPosts(reset = false) {
     if (loading.value) return
+    if (!reset && lastFetchTime.value && Date.now() - lastFetchTime.value < 30000) { loading.value = false; return }
     loading.value = true
     try {
       if (reset) { page.value = 0; posts.value = []; hasMore.value = true }
@@ -27,7 +28,7 @@ export const usePostStore = defineStore('post', () => {
       if (data && data.length < PAGE_SIZE) hasMore.value = false
       posts.value = reset ? (data || []) : [...posts.value, ...(data || [])]
       page.value++
-    } finally { loading.value = false }
+    } finally { loading.value = false; lastFetchTime.value = Date.now() }
   }
 
   async function fetchPostById(postId) {
@@ -134,7 +135,7 @@ export const usePostStore = defineStore('post', () => {
   }
 
   return {
-    posts, currentPost, loading, hasMore,
+    posts, currentPost, loading, hasMore, lastFetchTime,
     fetchPosts, fetchPostById, createPost, updatePost, deletePost, fetchPostsByAuthor,
     fetchPersonalizedFeed
   }

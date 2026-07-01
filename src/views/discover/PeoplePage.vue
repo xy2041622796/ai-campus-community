@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="people-page">
     <div class="people-header">
       <h1 class="people-title">
@@ -55,7 +55,6 @@
           </div>
         </div>
       </div>
-    </div>
 
     <div v-else class="people-empty">
       <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">

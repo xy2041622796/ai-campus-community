@@ -35,7 +35,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'\nimport { ElMessage } from 'element-plus'
+import { ref } from 'vue'
+import { ElMessage } from 'element-plus'
 import { supabase } from '@/api/supabase'
 
 const props = defineProps({

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="home-page">
     <!-- Hero Banner -->
     <div class="hero-section">
@@ -91,10 +91,6 @@
         <span class="end-label">已经到底了</span>
         <div class="end-line"></div>
       </div>
-        <div class="end-line"></div>
-        <span class="end-label">已经到底了</span>
-        <div class="end-line"></div>
-      </div>
     </div>
 
     <!-- 空状态 -->
@@ -123,10 +119,13 @@
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
-import { usePostStore } from '@/stores/post'\nimport { useAITopicsStore } from '@/stores/ai-topics'
+import { usePostStore } from '@/stores/post'
+import { useAITopicsStore } from '@/stores/ai-topics'
 
 const router = useRouter()
-const postStore = usePostStore()\nconst aiTopics = useAITopicsStore()
+const postStore = usePostStore()
+
+const aiTopics = useAITopicsStore()
 const scrollSentinel = ref(null)
 let scrollObserver = null
 const scrollLoading = ref(false)
@@ -175,10 +174,8 @@ function switchFeedMode(mode) {
   postStore.feedMode = mode
   if (mode === 'recommended') postStore.fetchPersonalizedFeed(true)
   else postStore.fetchPosts(true)
-
-
-
-  </script>
+}
+</script>
 
 <style scoped lang="scss">
 @use '@/assets/styles/variables' as *;

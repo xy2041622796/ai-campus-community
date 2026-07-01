@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="activities-page">
     <div class="activities-header">
       <h1 class="activities-title">
@@ -51,7 +51,6 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/api/supabase'
-import { useRouter } from 'vue-router'
 import { useNotificationStore } from '@/stores/notification'
 import { formatTime } from '@/utils/helpers'
 
@@ -59,8 +58,6 @@ const router = useRouter()
 const notifStore = useNotificationStore()
 const loading = ref(true)
 const seasonSuggestions = ref([])
-const router = useRouter()
-const activities = ref([])
 
 function goToPost(item) {
   if (item.post_id) router.push('/posts/' + item.post_id)

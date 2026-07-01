@@ -184,7 +184,11 @@ function formatDate(date) {
 
 async function refresh() {
   currentDate.value = new Date()
-  await digestStore.fetchDailyDigest()
+  if (digestStore.digest) {
+    await digestStore.incrementalRefresh()
+  } else {
+    await digestStore.fetchDailyDigest()
+  }
 }
 
 onMounted(async () => {

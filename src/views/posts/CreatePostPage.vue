@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="create-page-wrap">
   <div class="create-page">
     <div class="create-header">
@@ -33,7 +33,7 @@
           <div class="form-actions">
       <span v-if="reviewing" class="review-status">AI 审核中...</span>
             <el-button @click="router.back()">取消</el-button>
-            <el-button type="primary" :loading="submitting || reviewing.value" @click="handleSubmit">
+            <el-button type="primary" :loading="submitting || reviewing" @click="handleSubmit">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               发布帖子
             </el-button>
@@ -216,23 +216,7 @@ async function handleSubmit() {
   } catch (e) { ElMessage.error(e.message || '发布失败') }
   finally { submitting.value = false }
 }
-    } catch (e) {
-      console.error('[CreatePost] AI analysis skipped:', e)
-    }
-    await postStore.createPost({
-      title: form.title,
-      content: form.content,
-      images: form.images,
-      tags: form.tags,
-      intent, emotion, topics, summary
-    })
-    ElMessage.success('发布成功！')
-    router.push('/')
-  } catch (e) { ElMessage.error(e.message || '发布失败') }
-  finally { submitting.value = false }
-}
 
-// AI 内容审核
 // AI 内容审核
 async function moderateContent(title, content) {
   const start = Date.now()
@@ -244,7 +228,18 @@ async function moderateContent(title, content) {
         model: 'agnes-2.0-flash',
         messages: [{
           role: 'user',
-          content: '你是校园社区内容审核员。请检查以下帖子内容是否合规。\\n规则：\\n1. 禁止广告推广（招聘、兼职、买卖等商业信息）\\n2. 禁止辱骂人身攻击\\n3. 禁止色情低俗内容\\n4. 禁止敏感政治言论\\n5. 禁止重复刷屏内容\\n\\n请返回 JSON：{"passed": true/false, "reason": "不通过的原因，通过则留空"}\\n帖子内容：\\n标题：' + title + '\\n正文：' + content
+          content: '你是校园社区内容审核员。请检查以下帖子内容是否合规。\
+规则：\
+1. 禁止广告推广（招聘、兼职、买卖等商业信息）\
+2. 禁止辱骂人身攻击\
+3. 禁止色情低俗内容\
+4. 禁止敏感政治言论\
+5. 禁止重复刷屏内容\
+\
+请返回 JSON：{"passed": true/false, "reason": "不通过的原因，通过则留空"}\
+帖子内容：\
+标题：' + title + '\
+正文：' + content
         }]
       })
     })

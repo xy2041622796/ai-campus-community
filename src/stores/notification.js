@@ -1,4 +1,4 @@
-﻿import { defineStore } from 'pinia'
+import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { supabase } from '@/api/supabase'
 
@@ -6,8 +6,10 @@ export const useNotificationStore = defineStore('notification', () => {
   const notifications = ref([])
   const loading = ref(false)
   const unreadCount = ref(0)
+  const lastFetchTime = ref(null)
 
   async function fetchNotifications() {
+    if (lastFetchTime.value && Date.now() - lastFetchTime.value < 30000) return
     loading.value = true
     try {
       const { data: { user } } = await supabase.auth.getUser()
@@ -54,5 +56,5 @@ export const useNotificationStore = defineStore('notification', () => {
 
   const latestNotifications = computed(() => notifications.value.slice(0, 5))
 
-  return { notifications, loading, unreadCount, latestNotifications, fetchNotifications, markAsRead, markAllAsRead }
+    notifications, loading, unreadCount, latestNotifications, lastFetchTime, fetchNotifications, markAsRead, markAllAsRead
 })

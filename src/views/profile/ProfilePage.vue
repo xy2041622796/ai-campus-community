@@ -125,8 +125,8 @@ function goFollowers() { router.push('/profile/' + profileId.value + '/followers
 function goFollowing() { router.push('/profile/' + profileId.value + '/following') }
 
 const tabs = [
-  { key: 'posts', label: '收藏' },
-  { key: 'favorites', label: '帖子' },
+  { key: 'posts', label: '帖子' },
+  { key: 'favorites', label: '收藏' },
 ]
 
 async function loadProfile() {
@@ -134,8 +134,10 @@ async function loadProfile() {
   const { data } = await supabase.from('profiles').select('*').eq('id', userId).single()
   if (data) profileUser.value = data
   userPosts.value = await postStore.fetchPostsByAuthor(userId)
-  followStore.fetchFollowers(userId)
-  followStore.fetchFollowing(userId)
+  await Promise.all([
+    followStore.fetchFollowers(userId),
+    followStore.fetchFollowing(userId)
+  ])
   followers.value = followStore.followers
   following.value = followStore.following
   if (authStore.user?.id) {
