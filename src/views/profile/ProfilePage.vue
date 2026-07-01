@@ -117,7 +117,7 @@ const profileUser = ref(null)
 const userPosts = ref([])
 const followers = ref([])
 const following = ref([])
-const activeTab = ref('posts')
+const activeTab = ref(route.query.tab === 'favorites' ? 'favorites' : 'posts')
 
 const profileId = computed(() => route.params.id)
 const isOwnProfile = computed(() => authStore.user?.id === profileId.value)
