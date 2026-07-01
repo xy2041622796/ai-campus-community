@@ -56,5 +56,5 @@ export const useNotificationStore = defineStore('notification', () => {
 
   const latestNotifications = computed(() => notifications.value.slice(0, 5))
 
-    notifications, loading, unreadCount, latestNotifications, lastFetchTime, fetchNotifications, markAsRead, markAllAsRead
+  return { notifications, loading, unreadCount, latestNotifications, lastFetchTime, fetchNotifications, markAsRead, markAllAsRead }
 })
