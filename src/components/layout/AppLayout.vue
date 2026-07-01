@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="app-layout">
     <AppNavbar />
     <div class="app-body">
@@ -9,6 +9,7 @@
         </router-view></div>
       </main>
     </div>
+    <AIAssistant />
     <BottomNav />
   </div>
 </template>
@@ -17,6 +18,7 @@
 import AppNavbar from './AppNavbar.vue'
 import AppSidebar from './AppSidebar.vue'
 import BottomNav from './BottomNav.vue'
+import AIAssistant from '@/components/common/AIAssistant.vue'
 </script>
 
 <style scoped lang="scss">
