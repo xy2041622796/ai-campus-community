@@ -13,6 +13,41 @@
       </div>
     </div>
 
+
+    <!-- AI 找搭子 -->
+    <div class="buddy-search-section">
+      <div class="buddy-search-header">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span>AI 找搭子</span>
+      </div>
+      <p class="buddy-search-desc">描述你想找什么样的人，AI 帮你匹配</p>
+      <div class="buddy-search-input">
+        <el-input
+          v-model="buddyQuery"
+          placeholder="想找一个会Vue的人一起做项目..."
+          size="large"
+          clearable
+          @keyup.enter="searchBuddy"
+        />
+        <el-button type="primary" :loading="buddyLoading" :disabled="!buddyQuery.trim()" @click="searchBuddy">
+          AI 匹配
+        </el-button>
+      </div>
+      <div v-if="buddyResults.length" class="buddy-results">
+        <div v-for="(user, idx) in buddyResults" :key="user.id" class="buddy-result-card" @click="router.push('/profile/' + user.id)">
+          <div class="br-rank">{{ idx + 1 }}</div>
+          <div class="br-avatar">
+            <img v-if="user.avatar_url" :src="user.avatar_url" />
+            <div v-else class="br-avatar-ph">{{ (user.nickname || '?')[0] }}</div>
+          </div>
+          <div class="br-info">
+            <div class="br-name">{{ user.nickname }}</div>
+            <div class="br-meta">{{ user.college || '' }} {{ user.grade || '' }}</div>
+            <div class="br-reason">{{ user.reason }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div v-if="store.loading" class="people-loading">
       <div class="pl-spinner"></div>
       <span>加载中...</span>
@@ -71,14 +106,40 @@ import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useRecommendStore } from '@/stores/recommend'
 import { useAIStore } from '@/stores/ai'
-import { useAuthStore } from '@/stores/auth'
 import FollowButton from '@/components/common/FollowButton.vue'
 
 const router = useRouter()
 const store = useRecommendStore()
+const aiStore = useAIStore()
+const buddyQuery = ref('')
+const buddyLoading = ref(false)
+const buddyResults = ref([])
+
+async function searchBuddy() {
+  if (!buddyQuery.value.trim() || buddyLoading.value) return
+  buddyLoading.value = true
+  try {
+    const prompt = "User wants: " + buddyQuery.value + ". Recommend top 3 from: " + JSON.stringify(store.users.slice(0, 20).map(u => ({ id: u.id, nickname: u.nickname, college: u.college, bio: u.bio, common_tags: u.common_tags }))) + ". Return JSON: [{id, reason}]. Only JSON."
+    const res = await fetch('/agnes/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'agnes-2.0-flash', messages: [{ role: 'user', content: prompt }] })
+    })
+    if (res.ok) {
+      const data = await res.json()
+      const raw = data.choices?.[0]?.message?.content || '[]'
+      const cleaned = raw.replace(/```json\\s*/g, '').replace(/```\\s*/g, '').trim()
+      const matches = JSON.parse(cleaned)
+      buddyResults.value = matches.map(m => {
+        const user = store.users.find(u => u.id === m.id)
+        return user ? { ...user, reason: m.reason } : null
+      }).filter(Boolean).slice(0, 3)
+    }
+  } catch (e) { console.error(e) }
+  finally { buddyLoading.value = false }
+}
 const graphRelationships = store.graphRelationships
 const aiReasons = ref(new Map())
-const aiStore = useAIStore()
 const authStore = useAuthStore()
 
 const reasonLoading = ref(false)
@@ -117,6 +178,27 @@ async function generateReasons() {
 onMounted(() => { store.fetchRecommendations() })
 </script>
 
+
+/* AI 找搭子 */
+.buddy-search-section { background: linear-gradient(135deg, rgba(74,108,247,0.06), rgba(94,196,172,0.06)); border: 1px solid rgba(74,108,247,0.15); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+.buddy-search-header { display: flex; align-items: center; gap: 8px; font-size: 1.1rem; font-weight: 600; color: #1a1a2e; margin-bottom: 8px; }
+.buddy-search-header svg { color: #4A6CF7; }
+.buddy-search-desc { font-size: 0.85rem; color: #667788; margin-bottom: 16px; }
+.buddy-search-input { display: flex; gap: 12px; }
+.buddy-search-input :deep(.el-input__wrapper) { border-radius: 12px; border: 1px solid #e2e8f0; }
+.buddy-search-input :deep(.el-input__wrapper:focus-within) { border-color: #4A6CF7; box-shadow: 0 0 0 3px rgba(74,108,247,0.1); }
+.buddy-search-input .el-button { background: linear-gradient(135deg, #4A6CF7, #5EC4AC); border: none; font-weight: 600; }
+.buddy-results { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+.buddy-result-card { display: flex; align-items: center; gap: 12px; padding: 14px; background: white; border: 1px solid #e2e8f0; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; }
+.buddy-result-card:hover { border-color: #4A6CF7; box-shadow: 0 2px 8px rgba(74,108,247,0.1); }
+.br-rank { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, #4A6CF7, #5EC4AC); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0; }
+.br-avatar { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+.br-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.br-avatar-ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #4A6CF7, #5EC4AC); color: white; font-weight: 600; }
+.br-info { flex: 1; min-width: 0; }
+.br-name { font-weight: 600; font-size: 0.9rem; color: #1a1a2e; }
+.br-meta { font-size: 0.8rem; color: #667788; margin-top: 2px; }
+.br-reason { font-size: 0.8rem; color: #4A6CF7; margin-top: 4px; line-height: 1.4; }
 <style scoped lang="scss">
 @use '@/assets/styles/variables' as *;
 
@@ -224,4 +306,3 @@ onMounted(() => { store.fetchRecommendations() })
 
 .people-empty { text-align: center; padding: 80px 20px; color: $color-text-tertiary; svg { stroke: $color-text-tertiary; } h3 { font-size: $font-size-lg; font-weight: 600; color: $color-text-primary; margin: 12px 0 4px; } p { font-size: $font-size-sm; margin: 0; } }
 </style>
-
