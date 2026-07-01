@@ -133,3 +133,18 @@
 - AI 调用日志 → 全量追踪
 - Prompt 管理 → 版本控制
 - 数据缓存 → 30s 去重
+
+## 2026-07-01 16:30: AI 发帖助手（阶段 8.1）
+
+### 新增功能
+- ai.js: generatePost() 函数 - 用户输入一句话，AI 生成完整帖子
+- CreatePostPage: 顶部新增 AI 快速发帖区域
+- 当标题和内容都为空时显示助手界面
+- 用户输入想法后，AI 自动生成标题、正文、标签、情绪基调
+- 支持 Ctrl+Enter 快捷键触发生成
+
+### 技术实现
+- 使用 Agnes AI (agnes-2.0-flash) 生成帖子内容
+- Prompt 引导 AI 判断帖子类型（吐槽/求助/讨论/分享）
+- 返回 JSON 格式：postType, title, content, tags, emotion
+- 生成后自动填充表单，用户可编辑后发布
