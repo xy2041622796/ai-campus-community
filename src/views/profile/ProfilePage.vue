@@ -159,15 +159,15 @@ watch(() => route.params.id, loadProfile)
 
 /* ?? */
 .profile-cover {
-  position: relative;
-  background: linear-gradient(135deg, #4A6CF7 0%, #5EC4AC 50%, #3B82F6 100%);
-  border-radius: $radius-xl;
-  padding: 36px 28px 20px;
-  color: white;
-  overflow: hidden;
-  margin-bottom: 20px;
-}
-
+    position: relative;
+    background: linear-gradient(135deg, #4A6CF7 0%, #3B82F6 40%, #5EC4AC 100%);
+    border-radius: $radius-xl;
+    padding: 36px 28px 20px;
+    color: white;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 32px rgba(74, 108, 247, 0.25), 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
 .profile-stats-inline {
   display: flex;
   align-items: center;
@@ -175,24 +175,22 @@ watch(() => route.params.id, loadProfile)
   gap: 20px;
   margin-top: 16px;
   padding: 12px 20px;
-  background: rgba(255,255,255,0.12);
-  border-radius: $radius-md;
-  backdrop-filter: blur(8px);
+  background: rgba(255,255,255,0.15);
+  border-radius: $radius-lg;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.2);
 }
-
-.psi-item { text-align: center; cursor: pointer; padding: 0 4px; }
-.psi-num { display: block; font-size: $font-size-xl; font-weight: 700; color: white; }
-.psi-label { font-size: $font-size-xs; color: rgba(255,255,255,0.7); margin-top: 2px; }
 .psi-divider { width: 1px; height: 28px; background: rgba(255,255,255,0.2); }
 
 .cover-bg-pattern {
   position: absolute;
   inset: 0;
   opacity: 0.06;
-  background-image:
-    radial-gradient(circle at 15% 30%, white 2px, transparent 2px),
-    radial-gradient(circle at 80% 60%, white 1.5px, transparent 1.5px);
-  background-size: 40px 40px, 60px 60px;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(255,255,255,0.15) 1px, transparent 1px),
+      radial-gradient(circle at 80% 60%, rgba(255,255,255,0.1) 1px, transparent 1px),
+      radial-gradient(circle at 50% 80%, rgba(255,255,255,0.08) 1px, transparent 1px);
+    background-size: 30px 30px, 50px 50px, 40px 40px;
 }
 
 .cover-content {
@@ -204,9 +202,10 @@ watch(() => route.params.id, loadProfile)
 }
 
 .profile-avatar {
-  border: 3px solid rgba(255,255,255,0.3);
-  border-radius: 50%;
-  flex-shrink: 0;
+    border: 3px solid rgba(255,255,255,0.4);
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
 }
 
 .profile-info { flex: 1; min-width: 0; padding-top: 8px; }

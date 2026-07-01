@@ -16,3 +16,5 @@ skills-lock.json
 /docs/*.md
 
 *.ps1
+
+build_output.txt

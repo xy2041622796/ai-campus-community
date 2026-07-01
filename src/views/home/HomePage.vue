@@ -187,7 +187,7 @@ function switchFeedMode(mode) {
   border-radius: 14px;
   padding: 20px;
   margin-bottom: 16px;
-  transition: box-shadow 0.2s ease;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 .ai-topics-section:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
 
@@ -214,9 +214,9 @@ function switchFeedMode(mode) {
 .ai-topic-card {
   display: flex; align-items: flex-start; gap: 12px;
   padding: 14px; border-radius: 12px;
-  cursor: pointer; transition: background 0.15s ease;
+  cursor: pointer; transition: background 0.15s ease, transform 0.15s ease;
+  &:hover { background: rgba(74,108,247,0.04); transform: translateX(4px); }
 }
-.ai-topic-card:hover { background: rgba(74,108,247,0.04); }
 
 .ai-topic-rank {
   width: 28px; height: 28px; border-radius: 8px;
@@ -275,15 +275,15 @@ function switchFeedMode(mode) {
 /* Hero */
 .hero-section {
   position: relative;
-  background: $color-card;
-  border: 1px solid $color-border-light;
+  background: linear-gradient(135deg, #4A6CF7 0%, #3B82F6 50%, #5EC4AC 100%);
+  border: none;
   border-radius: $radius-xl;
-  padding: 32px;
+  padding: 36px 32px;
   margin-bottom: 24px;
   overflow: hidden;
-}
-
-.hero-content { position: relative; z-index: 1; }
+  color: white;
+  box-shadow: 0 8px 32px rgba(74, 108, 247, 0.25), 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
 
 .hero-chip {
   display: inline-flex;
@@ -291,8 +291,8 @@ function switchFeedMode(mode) {
   gap: 4px;
   padding: 4px 12px;
   background: $color-primary-subtle;
-  color: $color-primary;
-  border-radius: $radius-round;
+    background: rgba(255,255,255,0.2);
+    color: white;
   font-size: $font-size-xs;
   font-weight: 600;
   margin-bottom: 12px;
@@ -302,14 +302,15 @@ function switchFeedMode(mode) {
   font-family: $font-display;
   font-size: $font-size-2xl;
   font-weight: 700;
-  color: $color-text-primary;
+    color: white;
   line-height: 1.25;
   margin-bottom: 8px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 .hero-sub {
   font-size: $font-size-sm;
-  color: $color-text-tertiary;
+    color: rgba(255,255,255,0.85);
   display: flex;
   align-items: center;
   gap: 6px;
