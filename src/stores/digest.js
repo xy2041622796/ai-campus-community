@@ -115,7 +115,7 @@ export const useDigestStore = defineStore('digest', () => {
           model: 'agnes-2.0-flash',
           messages: [{
             role: 'user',
-            content: `你是一名校园社区日报编辑。请根据以下今日社区数据，生成一份生动有趣的AI社区日报。
+            content: `你是一名校园社区日报编辑。请根据以下今日社区数据，为普通同学生成一份有趣、有用的日报。不要包含管理后台数据（如注册用户数），聚焦于同学们真正关心的内容。
 
 【数据统计】
 - 今日发帖数: ${posts.length}
@@ -198,7 +198,7 @@ ${activeUsersInfo || '- 暂无数据'}
         summary: '今日社区共有 ' + posts.length + ' 篇新帖子，' + commentCount + ' 条评论，' + newUserCount + ' 位新朋友加入。',
         postCount: posts.length,
         commentCount: commentCount,
-        newUserCount: newUserCount,
+
         moods: [
           { label: '积极', percent: 40, colorClass: 'positive' },
           { label: '平静', percent: 30, colorClass: 'calm' },
@@ -225,7 +225,7 @@ ${activeUsersInfo || '- 暂无数据'}
 
     loading.value = true
     try {
-      const [posts, commentCount, newUserCount, activeUsers] = await Promise.all([
+      const [posts, commentCount, , activeUsers] = await Promise.all([
         fetchTodayPosts(),
         fetchTodayCommentCount(),
         fetchNewUserCount(),
@@ -236,15 +236,15 @@ ${activeUsersInfo || '- 暂无数据'}
       const old = lastStats.value
       const hasChanges = (
         newPostCount !== old.postCount ||
-        commentCount !== old.commentCount ||
-        newUserCount !== old.newUserCount
+        commentCount !== old.commentCount
+
       )
 
       // Always update numeric stats immediately (no flash)
       Object.assign(digest.value, {
         postCount: newPostCount,
         commentCount: commentCount,
-        newUserCount: newUserCount,
+
         activeUsers: activeUsers
       })
 

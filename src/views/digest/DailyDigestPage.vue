@@ -48,7 +48,7 @@
 
     <!-- 日报内容 -->
     <template v-else-if="digestStore.digest">
-      <!-- 整体概览 -->
+      <!-- 今日概览 -->
       <section class="digest-section overview">
         <h3 class="section-title">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
@@ -57,21 +57,17 @@
         <div class="overview-summary">{{ digestStore.digest.summary }}</div>
         <div class="overview-stats">
           <div class="stat-card">
-            <div class="stat-num">{{ digestStore.digest.postCount ?? '-' }}</div>
+            <div class="stat-num">{{ digestStore.digest.postCount ?? "-" }}</div>
             <div class="stat-label">今日发帖</div>
           </div>
           <div class="stat-card">
-            <div class="stat-num">{{ digestStore.digest.commentCount ?? '-' }}</div>
+            <div class="stat-num">{{ digestStore.digest.commentCount ?? "-" }}</div>
             <div class="stat-label">全部评论</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-num">{{ digestStore.digest.newUserCount ?? '-' }}</div>
-            <div class="stat-label">新注册用户</div>
           </div>
         </div>
       </section>
 
-      <!-- 情绪趋势 -->
+      <!-- 社区情绪 -->
       <section class="digest-section mood">
         <h3 class="section-title">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -100,7 +96,7 @@
         </div>
       </section>
 
-      <!-- 热帖 TOP 5 -->
+      <!-- 今日热帖 TOP 5 -->
       <section class="digest-section hot-posts">
         <h3 class="section-title">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -114,9 +110,9 @@
             <div class="hot-content">
               <div class="hot-title">{{ post.title }}</div>
               <div class="hot-meta">
-                <span class="hot-author">{{ post.author?.nickname || '未知' }}</span>
+                <span class="hot-author">{{ post.author?.nickname || "未知" }}</span>
                 <span class="hot-dot">·</span>
-                <span class="hot-stats">❤️ {{ post.likes || 0 }} · 💬 {{ post.comments || 0 }}</span>
+                <span class="hot-stats">❤ {{ post.likes || 0 }} · 💬 {{ post.comments || 0 }}</span>
               </div>
             </div>
           </div>
@@ -124,24 +120,13 @@
         <div v-else class="no-data">暂无热帖数据</div>
       </section>
 
-      <!-- 活跃用户 -->
-      <section class="digest-section active-users">
+      <!-- 今日亮点 -->
+      <section v-if="digestStore.digest.highlight" class="digest-section highlight">
         <h3 class="section-title">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          新晋活跃用户
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          今日亮点
         </h3>
-        <div v-if="digestStore.digest.activeUsers?.length" class="user-list">
-          <div v-for="u in digestStore.digest.activeUsers" :key="u.id"
-            class="user-item" @click="$router.push('/profile/' + u.id)">
-            <img v-if="u.avatar_url" :src="u.avatar_url" class="user-avatar" />
-            <div v-else class="user-avatar-placeholder">{{ u.nickname?.[0] || '?' }}</div>
-            <div class="user-info">
-              <div class="user-name">{{ u.nickname || '未知用户' }}</div>
-              <div class="user-detail">{{ u.college || '未知学院' }} · {{ u.postCount }} 篇帖子</div>
-            </div>
-          </div>
-        </div>
-        <div v-else class="no-data">暂无活跃用户数据</div>
+        <div class="highlight-text">{{ digestStore.digest.highlight }}</div>
       </section>
 
       <!-- AI 建议 -->
@@ -551,6 +536,18 @@ onMounted(async () => {
 }
 
 /* ===== Advice ===== */
+
+.highlight-text {
+  font-size: 1.1rem;
+  color: $color-text-primary;
+  line-height: $line-height-relaxed;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(74, 108, 247, 0.06), rgba(94, 196, 172, 0.06));
+  border-radius: $radius-md;
+  border-left: 3px solid $color-primary;
+  font-weight: 500;
+}
+
 .advice-text {
   font-size: 0.95rem;
   color: $color-text-secondary;
