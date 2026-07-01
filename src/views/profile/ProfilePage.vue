@@ -23,26 +23,26 @@
             编辑资料
           </el-button>
         </div>
+      <div class="profile-stats-inline">
+        <div class="psi-item" @click="goFollowers()">
+          <span class="psi-num">{{ followers.length }}</span>
+          <span class="psi-label">粉丝</span>
+        </div>
+        <div class="psi-divider"></div>
+        <div class="psi-item" @click="goFollowing()">
+          <span class="psi-num">{{ following.length }}</span>
+          <span class="psi-label">关注</span>
+        </div>
+        <div class="psi-divider"></div>
+        <div class="psi-item">
+          <span class="psi-num">{{ userPosts.length }}</span>
+          <span class="psi-label">帖子</span>
+        </div>
+      </div>
       </div>
     </div>
 
     
-    <div class="profile-stats">
-      <div class="stat-item" @click="goFollowers()">
-        <span class="stat-num">{{ followers.length }}</span>
-        <span class="stat-label">粉丝</span>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item" @click="goFollowing()">
-        <span class="stat-num">{{ following.length }}</span>
-        <span class="stat-label">关注</span>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <span class="stat-num">{{ userPosts.length }}</span>
-        <span class="stat-label">帖子</span>
-      </div>
-    </div>
 
     
     <div v-if="profileUser.interest_tags?.length" class="profile-tags">
