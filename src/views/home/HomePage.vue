@@ -138,6 +138,8 @@ const scrollLoading = ref(false)
 // 无限滚动：当 sentinel 元素进入视口时加载更多
 onMounted(() => {
   postStore.fetchPosts(true)
+  updateGreeting()
+  loadInsights()
   loadTopics()
 
   scrollObserver = new IntersectionObserver((entries) => {
@@ -163,6 +165,10 @@ onUnmounted(() => {
   if (scrollObserver) scrollObserver.disconnect()
 })
 const currentDate = ref(new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' }))
+const greeting = ref("你好，欢迎回来")
+const insights = ref([])
+function updateGreeting() { const h = new Date().getHours(); const n = authStore.user?.nickname || "同学"; if (h < 6) greeting.value = "夜深了，" + n + "还在逛社区？"; else if (h < 12) greeting.value = "早上好，" + n + "！新的一天开始了"; else if (h < 14) greeting.value = "中午好，" + n + "！吃饭了吗？"; else if (h < 18) greeting.value = "下午好，" + n + "！"; else if (h < 22) greeting.value = "晚上好，" + n + "！"; else greeting.value = "夜深了，" + n + "注意休息哦" }
+async function loadInsights() { const r = []; if (postStore.posts.length > 0) r.push({ type: "posts", text: "今天社区有 " + postStore.posts.length + " 条新动态" }); try { await eventStore.fetchEvents(); const u = eventStore.events.filter(e => e.status === "open").length; if (u > 0) r.push({ type: "events", text: "有 " + u + " 个活动正在报名" }); } catch(e){} r.push({ type: "create", text: "有什么想分享的？试试 AI 帮你发帖" }); insights.value = r }
 const heroTitle = ref('校园动态')
 const onlineCount = ref(128)
 
@@ -179,6 +185,8 @@ function switchFeedMode(mode) {
   postStore.feedMode = mode
   if (mode === 'recommended') postStore.fetchPersonalizedFeed(true)
   else postStore.fetchPosts(true)
+  updateGreeting()
+  loadInsights()
 }
 </script>
 
