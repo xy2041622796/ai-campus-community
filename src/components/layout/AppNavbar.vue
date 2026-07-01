@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <!-- 导航栏 Store 初始化 -->
   <header class="$z-navbar">
     <div class="navbar-inner">
@@ -68,16 +68,18 @@
 
         <!-- 用户 -->
         <el-dropdown trigger="click" @command="handleCommand">
-          <button class="btn-user">
+          <button class="btn-user" v-if="authStore.user">
             <img v-if="authStore.user?.avatar_url" :src="authStore.user.avatar_url" class="u-avatar" />
             <div v-else class="u-avatar ph">{{ authStore.user?.nickname?.[0] || '?' }}</div>
             <span class="u-name">{{ authStore.user?.nickname || '未登录' }}</span>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="u-chev">
-              <polyline points="6 9 12 15 18 9"/>
-            </svg>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="u-chev"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <button class="btn-user" v-else @click="router.push('/login')">
+            <div class="u-avatar ph">?</div>
+            <span class="u-name">登录</span>
           </button>
           <template #dropdown>
-            <el-dropdown-menu>
+            <el-dropdown-menu v-if="authStore.user">
               <el-dropdown-item command="profile">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;vertical-align:middle"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 个人主页
@@ -130,10 +132,10 @@ function handleSelect(item) {
   router.push('/profile/' + item.id)
 }
 
-function handleCommand(cmd) {
+async function handleCommand(cmd) {
   if (cmd === 'profile') router.push('/profile/' + authStore.user?.id)
   else if (cmd === 'settings') router.push('/settings/profile')
-  else if (cmd === 'logout') { authStore.logout(); router.push('/login') }
+    else if (cmd === 'logout') { await authStore.logout(); router.push('/login') }
 }
 </script>
 
