@@ -1,23 +1,24 @@
 <template>
   <div class="home-page">
-    <!-- Hero Banner -->
+    <!-- Hero Banner - 个性化问候 -->
     <div class="hero-section">
       <div class="hero-bg-pattern"></div>
       <div class="hero-content">
-        <div class="hero-chip">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-          校园动态
-        </div>
-        <h1 class="hero-title">{{ heroTitle }}</h1>
+        <h1 class="hero-title">{{ greeting }}</h1>
         <p class="hero-sub">
-          <span class="hero-stat">🔥 {{ onlineCount }} 人在线</span>
-          <span class="hero-dot">·</span>
-          <span>{{ currentDate }}</span>
+          <span class="hero-stat">{{ currentDate }}</span>
         </p>
       </div>
       <div class="hero-glow"></div>
     </div>
 
+    <!-- AI 洞察卡片 -->
+    <div v-if="insights.length" class="insights-section">
+      <div v-for="(insight, idx) in insights" :key="idx" class="insight-card" :class="insight.type">
+        <div class="insight-icon" v-html="insight.icon"></div>
+        <div class="insight-text">{{ insight.text }}</div>
+      </div>
+    </div>
     <!-- Feed 工具栏 -->
     <div class="feed-toolbar">
       <div class="feed-tabs">
@@ -121,11 +122,15 @@ import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePostStore } from '@/stores/post'
 import { useAITopicsStore } from '@/stores/ai-topics'
+import { useAuthStore } from '@/stores/auth'
+import { useEventStore } from '@/stores/event'
 
 const router = useRouter()
 const postStore = usePostStore()
 
 const aiTopics = useAITopicsStore()
+const authStore = useAuthStore()
+const eventStore = useEventStore()
 const scrollSentinel = ref(null)
 let scrollObserver = null
 const scrollLoading = ref(false)
@@ -176,6 +181,50 @@ function switchFeedMode(mode) {
   else postStore.fetchPosts(true)
 }
 </script>
+
+
+/* AI 洞察卡片 */
+.insights-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.insight-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.insight-card:hover {
+  border-color: #4A6CF7;
+  background: rgba(74, 108, 247, 0.02);
+}
+
+.insight-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(74, 108, 247, 0.08);
+  color: #4A6CF7;
+  flex-shrink: 0;
+}
+
+.insight-card.posts .insight-icon { background: rgba(74, 108, 247, 0.08); color: #4A6CF7; }
+.insight-card.events .insight-icon { background: rgba(94, 196, 172, 0.1); color: #5EC4AC; }
+.insight-card.create .insight-icon { background: rgba(255, 107, 74, 0.08); color: #FF6B4A; }
 
 <style scoped lang="scss">
 @use '@/assets/styles/variables' as *;
