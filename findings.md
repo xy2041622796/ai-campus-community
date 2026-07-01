@@ -1,4 +1,4 @@
-# 项目发现与研究记录
+﻿# 项目发现与研究记录
 
 > 最后更新: 2026-07-01 11:00
 
@@ -101,3 +101,24 @@
 - /agnes → apihub.agnes-ai.com（图片/润色/审核）
 - /coze → api.coze.cn（内容分析）
 - /api → Vercel（生产环境 Coze 代理）
+
+### 工程化 AI 调用层（2026-07-01）
+
+#### safeAICall()
+- 统一的 AI 调用封装，处理重试、超时、校验
+- 超时控制：默认 30s，可通过 timeout 参数调整
+- 自动重试：最多 2 次，指数退避（1s → 2s → 4s）
+- JSON 校验：失败时尝试从文本中提取 JSON
+- 日志自动记录：每次调用自动记录延迟和成功率
+
+#### agnesCall() / cozeCall()
+- Agnes AI 和 Coze Workflow 的专用封装
+- 开发环境：/coze proxy → api.coze.cn
+- 生产环境：/api/coze → Vercel Serverless Function
+
+#### 架构决策
+- 1 个 Coze Workflow 负责内容理解（设计合理）
+- 图片/润色/审核由 Agnes AI 处理（避免 Workflow 膨胀）
+- 逻辑计算放在 Supabase RPC（Embedding + 排序）
+- AI 调用统一走 safeAICall（重试 + 超时 + 校验）
+
