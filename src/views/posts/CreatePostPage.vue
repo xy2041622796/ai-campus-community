@@ -6,17 +6,53 @@
       <p class="create-desc">分享校园生活的点滴</p>
     </div>
 
+
+    <!-- AI 快速发帖助手 -->
+    <div v-if="!form.title && !form.content" class="ai-assistant-section">
+      <div class="ai-assistant-header">
+        <div class="ai-assistant-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/></svg>
+        </div>
+        <div>
+          <h3 class="ai-assistant-title">AI 发帖助手</h3>
+          <p class="ai-assistant-desc">用一句话告诉 AI 你想发什么，帮你生成完整帖子</p>
+        </div>
+      </div>
+      <div class="ai-assistant-input">
+        <el-input
+          v-model="quickInput"
+          type="textarea"
+          :rows="3"
+          placeholder="Type your idea here..."
+          :disabled="quickGenerating"
+          @keyup.ctrl.enter="handleQuickGenerate"
+        />
+        <div class="ai-assistant-actions">
+          <span class="ai-assistant-hint">Ctrl + Enter 快速生成</span>
+          <el-button
+            type="primary"
+            :loading="quickGenerating"
+            :disabled="!quickInput.trim()"
+            @click="handleQuickGenerate"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/></svg>
+            AI 生成帖子
+          </el-button>
+        </div>
+      </div>
+    </div>
+
     <div class="form-card">
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
         <el-form-item label="标题" prop="title">
-          <el-input v-model="form.title" placeholder="给你的帖子起个标题..." size="large" maxlength="30" show-word-limit />
+          <el-input v-model="form.title" placeholder="Type your idea here..." size="large" maxlength="30" show-word-limit />
         </el-form-item>
 
         <el-form-item label="正文" prop="content">
           <div class="content-toolbar">
             <el-button size="small" class="ai-polish-btn" :loading="polishLoading" :disabled="!form.content.trim()" @click="handlePolish"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> 润色</el-button>
           </div>
-          <el-input v-model="form.content" type="textarea" :rows="6" placeholder="分享你的校园故事、问题或想法..." maxlength="2000" show-word-limit />
+          <el-input v-model="form.content" type="textarea" :rows="6" placeholder="Type your idea here..." maxlength="2000" show-word-limit />
         </el-form-item>
 
         <el-form-item label="图片">
@@ -87,6 +123,8 @@ const aiStore = useAIStore()
 const showPolishDialog = ref(false)
 const polishOriginal = ref('')
 const polishResult = ref('')
+const quickInput = ref('')
+const quickGenerating = ref(false)
 
 const charCount = computed(() => form.content.length)
 
@@ -127,6 +165,28 @@ function handleAcceptPolish() {
   showPolishDialog.value = false
   polishResult.value = null
 }
+
+async function handleQuickGenerate() {
+  if (!quickInput.value.trim()) return
+  quickGenerating.value = true
+  try {
+    const result = await aiStore.generatePost(quickInput.value)
+    if (result) {
+      form.title = result.title || ''
+      form.content = result.content || ''
+      form.tags = result.tags || []
+      ElMessage.success('AI 已生成帖子，请检查后发布')
+    } else {
+      ElMessage.error('AI 生成失败，请重试')
+    }
+  } catch (e) {
+    console.error('[QuickPost] error:', e)
+    ElMessage.error('AI 服务异常')
+  } finally {
+    quickGenerating.value = false
+  }
+}
+
 
 function handleRePolish() {
   showPolishDialog.value = false
@@ -260,6 +320,84 @@ async function moderateContent(title, content) {
   }
 }
 </script>
+
+
+/* AI 发帖助手 */
+.ai-assistant-section {
+  background: linear-gradient(135deg, rgba(74, 108, 247, 0.06), rgba(94, 196, 172, 0.06));
+  border: 1px solid rgba(74, 108, 247, 0.15);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.ai-assistant-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.ai-assistant-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #4A6CF7, #5EC4AC);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+.ai-assistant-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin: 0 0 4px;
+}
+
+.ai-assistant-desc {
+  font-size: 0.85rem;
+  color: #667788;
+  margin: 0;
+}
+
+.ai-assistant-input {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ai-assistant-input :deep(.el-textarea__inner) {
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  resize: none;
+}
+
+.ai-assistant-input :deep(.el-textarea__inner:focus) {
+  border-color: #4A6CF7;
+  box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.1);
+}
+
+.ai-assistant-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ai-assistant-hint {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.ai-assistant-actions .el-button {
+  background: linear-gradient(135deg, #4A6CF7, #5EC4AC);
+  border: none;
+  font-weight: 600;
+}
 
 <style scoped lang="scss">
 @use '@/assets/styles/variables' as *;

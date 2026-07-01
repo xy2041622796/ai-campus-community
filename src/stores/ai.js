@@ -1,4 +1,4 @@
-﻿import { defineStore } from 'pinia'
+import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { supabase } from '@/api/supabase'
@@ -240,10 +240,33 @@ export const useAIStore = defineStore('ai', () => {
     }
   }
 
+
+  // ============ AI 发帖助手 ============
+  async function generatePost(userInput) {
+    try {
+      const prompt = "You are a campus post assistant. User typed: " + userInput + ". Judge post type (vent/help/discuss/share), then generate: {postType, title(15chars), content(100-300chars casual), tags(3 campus tags), emotion}. Return pure JSON only."
+      const res = await fetch('/agnes/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'agnes-2.0-flash',
+          messages: [{ role: 'user', content: prompt }]
+        })
+      })
+      if (!res.ok) throw new Error('生成失败')
+      const data = await res.json()
+      const raw = data.choices?.[0]?.message?.content || '{}'
+      const cleaned = raw.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim()
+      return JSON.parse(cleaned)
+    } catch (e) {
+      console.error('[AI] generatePost error:', e)
+      return null
+    }
+  }
   return {
     polishing, suggesting, generating, semanticSearchLoading,
     polishContent, suggestTags, generateCoverImage,
     semanticSearch, generateSearchSummary, generateRecommendationReason,
-    planEvent, recommendEvents, analyzePostStructure
+    planEvent, recommendEvents, analyzePostStructure, generatePost
   }
 })
