@@ -9,6 +9,7 @@ export const usePostStore = defineStore('post', () => {
   const page = ref(0)
   const hasMore = ref(true)
   const lastFetchTime = ref(null)
+  const PAGE_SIZE = 10
   const feedMode = ref('recommended')
 
   async function fetchPosts(reset = false) {
@@ -48,7 +49,7 @@ export const usePostStore = defineStore('post', () => {
 
   async function createPost({ title, content, images, tags, intent, emotion, topics, summary }) {
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('请先登录')
+    if (!user) throw new Error('璇峰厛鐧诲綍')
     const { data, error } = await supabase.from('posts').insert({
       author_id: user.id,
       title: title.trim(),
@@ -94,7 +95,7 @@ export const usePostStore = defineStore('post', () => {
     return data || []
   }
 
-  // AI 个性化 Feed（按分数排序）
+  // AI 涓€у寲 Feed锛堟寜鍒嗘暟鎺掑簭锛?
   async function fetchPersonalizedFeed(reset = false) {
     if (loading.value) return
     loading.value = true
@@ -114,7 +115,7 @@ export const usePostStore = defineStore('post', () => {
 
       if (error) throw error
 
-      // 映射数据结构，与 fetchPosts 保持一致
+      // 鏄犲皠鏁版嵁缁撴瀯锛屼笌 fetchPosts 淇濇寔涓€鑷?
       const mappedData = (data || []).map(p => ({
         ...p,
         author: {
