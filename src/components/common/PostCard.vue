@@ -299,7 +299,7 @@ function formatTime(dateStr) {
   cursor: pointer;
   color: $color-text-tertiary;
   font-size: $font-size-sm;
-  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   position: relative;
 
   &:hover { background: $color-primary-subtle; color: $color-primary; }
@@ -307,35 +307,35 @@ function formatTime(dateStr) {
 
   &.like-btn.active {
     color: $color-heart;
-    background: rgba(255, 71, 87, 0.06);
-    animation: likePop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    background: rgba(255, 71, 87, 0.08);
+    animation: likeBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   &.fav-btn.active {
     color: #F5A623;
-    background: rgba(245, 166, 35, 0.08);
-    animation: likePop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    background: rgba(245, 166, 35, 0.1);
+    animation: starBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  svg { transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  svg { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), fill 0.3s ease, stroke 0.3s ease; }
   &.active svg { transform: scale(1.15); }
 }
 
-@keyframes likePop {
+@keyframes likeBounce {
   0% { transform: scale(1); }
-  30% { transform: scale(1.12); }
+  15% { transform: scale(1.25); }
+  30% { transform: scale(0.9); }
+  45% { transform: scale(1.1); }
   60% { transform: scale(0.95); }
   100% { transform: scale(1); }
 }
 
-.action-label { font-weight: 500; }
-
-/* AI 结构化标签 */
-.card-ai-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 10px;
+@keyframes starBounce {
+  0% { transform: scale(1) rotate(0deg); }
+  20% { transform: scale(1.3) rotate(-10deg); }
+  40% { transform: scale(0.85) rotate(5deg); }
+  60% { transform: scale(1.15) rotate(-3deg); }
+  80% { transform: scale(0.95) rotate(1deg); }
+  100% { transform: scale(1) rotate(0deg); }
 }
-
 .ai-badge {
   font-size: 0.7rem;
   padding: 2px 8px;

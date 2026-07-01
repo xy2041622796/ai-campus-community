@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="post-detail-root">
     <div class="detail-page" v-if="post">
     <!-- 返回按钮 -->
@@ -196,14 +196,33 @@ function formatTime(dateStr) {
   background: $color-card; color: $color-text-secondary; font-weight: 500; cursor: pointer; transition: $transition-fast;
   &:hover { border-color: $color-primary; color: $color-primary; }
   &:active { transform: scale(0.97); }
-  &.active { border-color: transparent; }
-  &.active:first-child { background: rgba(255, 71, 87, 0.06); color: $color-heart; }
-  &.active:last-child { background: rgba(245, 166, 35, 0.08); color: #F5A623; }
+  &.active { border-color: transparent; animation: likeBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  &.active:first-child { background: rgba(255, 71, 87, 0.08); color: $color-heart; }
+  &.active:last-child { background: rgba(245, 166, 35, 0.1); color: #F5A623; animation: starBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  svg { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), fill 0.3s ease, stroke 0.3s ease; }
 }
 .detail-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 0; color: $color-text-tertiary; }
 .dl-spinner { width: 32px; height: 32px; border: 3px solid $color-border; border-top-color: $color-primary; border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+
+@keyframes likeBounce {
+  0% { transform: scale(1); }
+  15% { transform: scale(1.25); }
+  30% { transform: scale(0.9); }
+  45% { transform: scale(1.1); }
+  60% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+@keyframes starBounce {
+  0% { transform: scale(1) rotate(0deg); }
+  20% { transform: scale(1.3) rotate(-10deg); }
+  40% { transform: scale(0.85) rotate(5deg); }
+  60% { transform: scale(1.15) rotate(-3deg); }
+  80% { transform: scale(0.95) rotate(1deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
 .comment-section {
   margin-top: 20px; background: $color-card; border: $color-border;
   border-radius: $radius-xl; padding: 24px 32px; display: flex; flex-direction: column; gap: 16px;
@@ -227,8 +246,6 @@ function formatTime(dateStr) {
   .detail-card, .comment-section { padding: 20px; border-radius: $radius-md; }
 }
 </style>
-
-
 
 
 
