@@ -1,6 +1,6 @@
 # 项目发现与研究记录
 
-> 最后更新: 2026-07-01 14:30
+> 最后更新: 2026-07-01 16:00
 
 ## 架构决策
 
@@ -36,22 +36,22 @@
 - 已集成到 ai-log.js 记录日志
 
 ### AI 推荐原因（Explainable Recommendation）
-- PostCard：基于 matched_topics/intent/emotion 显示推荐理由
-- PeoplePage：显示关系图谱摘要（共同兴趣/同校/共同喜欢）
+- PostCard：基于 matched_topics/intent/emotion 展示推荐理由
+- PeoplePage：展示关系图谱摘要（共同兴趣/同校/共同喜欢）
 - 两种数据源：AI 生成 + 关系图谱
 
 ### AI 评论助手
 - CommentForm 新增"AI 建议"按钮
 - 支持回复建议和帖子评论建议
-- 20 字以内的简短友好回复
+- 20 字以内的简洁友好回复
 
 ### AI 社交关系图谱
-- batch_analyze_relationships 批量 RPC（2 次替代 N+1 次）
+- batch_analyze_relationships 批量 RPC（1 次替代 N+1 次）
 - 关系类型：common_tags / same_college / mutual_like / follower
 - PeoplePage 自动展示关系详情
 
 ### AI 主动系统
-- ai-topics store 检测社区活跃度（6小时阈值）
+- ai-topics store 检测社区活跃度（6 小时阈值）
 - 冷清时生成通用话题，活跃时基于热帖延伸
 - 首页 Feed 顶部显示 AI 话题卡片
 
@@ -78,7 +78,7 @@
 
 ### 架构决策
 - 1 个 Coze Workflow 负责内容理解（设计合理）
-- 图片/润色/审核由 Agnes AI 处理（避免 Workflow 膨胀）
+- 图片/润色/审核用 Agnes AI 处理（避免 Workflow 膨胀）
 - 逻辑计算放在 Supabase RPC（Embedding + 排序）
 - AI 调用统一走 safeAICall（重试 + 超时 + 校验）
 

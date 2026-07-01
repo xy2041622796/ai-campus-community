@@ -1,16 +1,16 @@
 # AI Campus Community - 项目任务计划
 
-> 最后更新: 2026-07-01 14:30
+> 最后更新: 2026-07-01 16:00
 
-## 项目概述
+## 项目概览
 
-**项目名称:** AI Campus Community（AI 驱动的校园社交操作系统）
+**项目名称:** AI Campus Community（AI 驱动的校园社交协作系统）
 **技术栈:** Vue 3 + JavaScript + Vite + Element Plus + Pinia + Vue Router + Supabase
 **AI 引擎:** Coze Workflow（内容分析）+ Agnes AI（图片/润色/审核/Embedding）
-**部署:** Vercel（前端 + Serverless）+ Supabase（数据库 + Auth + Storage）
+**部署:** Vercel（前端+Serverless）+ Supabase（数据库 + Auth + Storage）
 **仓库:** https://github.com/xy2041622796/ai-campus-community
 
-**项目定位:** 从「校园社区平台」升级为「AI 驱动的校园社交智能系统」
+**项目定位:** 从"校园社区平台"升级为"AI 驱动的校园社交智能系统"。
 
 ---
 
@@ -38,7 +38,7 @@
 
 ### 阶段 4: AI 驱动升级
 - 帖子语义结构化（intent/emotion/topics/summary）
-- AI 用户画像 / AI 社区日报 / AI Feed 重排序
+- AI 用户画像 / AI 社区日报 / AI Feed 重排度
 - Coze Workflow 集成（Vite Proxy + stream_run）
 - 双模式 Feed（为你推荐 / 最新动态）
 
@@ -55,6 +55,16 @@
 - 日报页增量刷新（30s 缓存）
 - Store 数据缓存（post/event/notification/follow）
 - 修复编译错误（重复代码/模板结构/编码问题）
+
+### 阶段 7: UI/UX 优化（2026-07-01 下午）
+- Profile 封面与统计融合（渐变卡片内联显示）
+- 退出登录后下拉菜单状态更新
+- 下拉菜单优化（个人主页/我的收藏/退出登录）
+- 通知铃铛：无消息时不显示红点
+- 点赞收藏弹性动画（likeBounce + starBounce）
+- 首页 Hero 改为渐变背景
+- Google Fonts 引入（Inter + Noto Sans SC）
+- 日报模块重新设计（面向普通用户）
 
 ---
 
@@ -142,7 +152,7 @@
 
 **运行时:** vue ^3.5.13, vue-router ^4.5.0, pinia ^3.0.0, element-plus ^2.9.0, @supabase/supabase-js ^2.49.0
 
-**开发:** vite ^6.2.0, @vitejs/plugin-vue ^5.2.0, sass ^1.83.0
+**开发时:** vite ^6.2.0, @vitejs/plugin-vue ^5.2.0, sass ^1.83.0
 
 ---
 
@@ -174,12 +184,18 @@
 | ProfilePage 异步时序 | Promise.all + await |
 | PeoplePage 多余 closing div | 删除多余的 </div> |
 | ActivitiesPage 重复 import | 删除重复行 |
+| ref is not defined (PostCard) | 添加 ref 到 import |
+| PAGE_SIZE is not defined (post.js) | 恢复丢失的常量 |
+| store return 语句缺失 return 关键字 | 修复 notification/post/event.js |
+| CSS 闭合括号缺失 | 逐个修复 profile/home/digest 页面 |
+| 下拉菜单退出登录状态不更新 | async logout + 条件渲染 |
+| 通知无消息时显示红点 | 移除 v-else 的 badge-dot |
 
 ---
 
 ## 当前状态
 
-**项目已完成全部 6 个阶段**，构建通过（1736 modules），已推送到 GitHub。
+**项目已完成全部 7 个阶段**，构建通过（1736 modules），已推送到 GitHub。
 
 **核心能力矩阵：**
 - AI 内容理解 → 结构化分析
@@ -192,3 +208,4 @@
 - AI 调用日志 → 全量追踪
 - Prompt 管理 → 版本控制
 - 数据缓存 → 30s 去重
+- UI/UX → 弹性动画 + 渐变视觉 + 响应式布局
